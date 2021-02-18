@@ -1,0 +1,22 @@
+{
+  "name": "very-simple-components",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [
+    "components",
+    "vanilla",
+    "simple"
+  ],
+  "author": "arnoson",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.12.13",
+    "@babel/preset-env": "^7.12.13",
+    "@types/jest": "^26.0.20",
+    "jest": "^26.6.3"
+  }
+}

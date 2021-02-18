@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "checkJs": true,
+    "lib": ["es6", "dom"]
+  },
+  "typeAcquisition": {
+    "include": ["jest"]
+  },
+  "exclude": ["dist"]
+}
