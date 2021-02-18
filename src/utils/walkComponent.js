@@ -9,7 +9,11 @@ export const walkComponent = (el, callback, isChild = false) => {
 
   let node = /** @type {HTMLElement} */ (el.firstElementChild)
   while (node) {
-    if (!node.hasAttribute('data-component')) {
+    if (
+      !node.hasAttribute('data-component') &&
+      !node.hasAttribute('data-very-ignore')
+    ) {
+      node.style.backgroundColor = 'yellow'
       callback(node)
       walkComponent(node, callback, true)
     }
