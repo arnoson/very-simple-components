@@ -1,11 +1,11 @@
 /**
- * Eval an expression in a context.
+ * Eval an event expression in a context.
  * Highly inspired by alpine.js (https://github.com/alpinejs/alpine/blob/95cff65be3a91976222f7a72a4d3ab9f52b281bc/src/utils.js#L100)
  * @param {object} context
  * @param {string} expression
  * @returns {Function}
  */
-export const evalExpression = (context, expression) => {
+export const evalEventExpression = (context, expression) => {
   const body = `with(context) { return ${expression} }`
 
   if (context[expression]) {

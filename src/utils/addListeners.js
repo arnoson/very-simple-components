@@ -1,4 +1,4 @@
-import { evalExpression } from './evalExpression.js'
+import { evalEventExpression } from './evalEventExpression.js'
 
 const eventPrefix = 'data-on-'
 const eventPrefixLength = eventPrefix.length
@@ -13,7 +13,7 @@ const eventPrefixLength = eventPrefix.length
  */
 const addListener = (el, event, expression, context) => {
   /** @type {*} */
-  const handler = evalExpression(context, expression)
+  const handler = evalEventExpression(context, expression)
   el.addEventListener(event, handler)
 }
 
