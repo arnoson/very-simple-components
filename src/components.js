@@ -4,15 +4,15 @@ import { addListeners, getRefs, walkComponent } from './utils/utils.js'
  * @typedef {({ el: HTMLElement, refs: Refs}) => object?} Component
  */
 
-/** @type {Map<string, Component>} */
-const components = new Map()
+/** @type {Object<string, Component>} */
+const components = {}
 
 /**
  * @private
  * @param {HTMLElement} el
  * @returns {Component}
  */
-const getComponent = el => components.get(el.dataset.component)
+const getComponent = el => components[el.dataset.component]
 
 /**
  * @param {string} name
@@ -20,7 +20,7 @@ const getComponent = el => components.get(el.dataset.component)
  * @returns {Component}
  */
 export const registerComponent = (name, component) => {
-  components.set(name, component)
+  components[name] = component
   return component
 }
 
@@ -57,10 +57,11 @@ export const mountComponents = (root = document.body) => {
  * @param {HTMLElement} root
  */
 const mountChildComponents = root => {
-  components.forEach((component, name) => {
-    root.querySelectorAll(`[data-component='${name}']`).forEach(
-      /** @param {HTMLElement} el */
-      el => mountComponent(el, component, true)
-    )
-  })
+  for (const name in components) {
+    const elms = root.querySelectorAll(`[data-component='${name}']`)
+    for (let i = 0; i < elms.length; i++) {
+      const el = /** @type {HTMLElement} */ (elms[i])
+      mountComponent(el, components[name], true)
+    }
+  }
 }

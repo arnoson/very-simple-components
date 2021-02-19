@@ -8,13 +8,12 @@
 export const evalExpression = (context, expression) => {
   const body = `with(context) { return ${expression} }`
 
-  if (Object.keys(context).includes(expression)) {
+  if (context[expression]) {
     // Handle short notations (`test` instead of `test()`).
     const fn = new Function('context', body)(context)
-    return (
-      /** @param  {...any} args */
-      (...args) => fn.call(context, ...args)
-    )
+    return function () {
+      fn.apply(context, arguments)
+    }
   } else {
     const fn = new Function('context', '$event', body)
     return (
