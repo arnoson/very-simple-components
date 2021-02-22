@@ -1,5 +1,13 @@
-import { walkComponent, parseEvents, registerEvents } from './utils/utils.js'
-import './types'
+import {
+  walkComponent,
+  parseEvents,
+  registerEvents,
+  isString
+} from './utils/utils.js'
+
+/**
+ * @typedef {({ el: HTMLElement, refs: Refs}) => object?} Component
+ */
 
 /** @type {Object<string, Component>} */
 const components = {}
@@ -29,6 +37,8 @@ export const registerComponent = (name, component) => {
 export const mountComponent = (el, component = null, isChild = false) => {
   component = component ?? getComponent(el)
 
+  // We first store all events without registering them, because we don't know
+  // the refs yet (which we need to create the event handlers' context).
   const allEvents = []
   const refs = {}
 
@@ -56,11 +66,12 @@ export const mountComponent = (el, component = null, isChild = false) => {
   })
 
   const context = component({ el, refs })
-
   registerEvents(allEvents, context)
 
-  const veryEl = /** @type {VeryHTMLElement} */ (el)
-  veryEl.$very = context
+  // Store the context on the el so we can retrieve it with the `very()` helper
+  // function.
+  /* @ts-ignore */
+  el.__very = context
 
   // `mountChildComponents` will detect also nested children so we have to call
   // it only once on the top component.
@@ -90,3 +101,11 @@ const mountChildComponents = root => {
     }
   }
 }
+
+/**
+ *
+ * @param {string | HTMLElement} el An element (or an id).
+ */
+export const very = el =>
+  // @ts-ignore
+  (isString(el) ? document.getElementById(el) : el)?.__very

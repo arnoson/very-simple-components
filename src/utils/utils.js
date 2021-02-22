@@ -1,2 +1,3 @@
-export * from './events.js'
-export * from './walkComponent.js'
+export * from './events'
+export * from './walkComponent'
+export * from './isString'
