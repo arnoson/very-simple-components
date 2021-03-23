@@ -39,7 +39,7 @@ export const mountComponent = (el, isChild = false) => {
   const component = getComponent(el)
   if (component) {
     /* @ts-ignore */
-    el.__very_instance = component(el)
+    el.$component = component(el) || {}
   }
 
   if (!isChild) {
@@ -52,7 +52,11 @@ const mountChildComponents = el => {
   const elements = el.querySelectorAll('[data-component]')
   for (let i = 0; i < elements.length; i++) {
     const el = /** @type {HTMLElement} */ (elements[i])
-    mountComponent(el, true)
+    // Don't re-initialize components.
+    /* @ts-ignore */
+    if (!el.$component) {
+      mountComponent(el, true)
+    }
   }
 }
 
