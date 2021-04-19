@@ -1,11 +1,15 @@
 import { walkComponent, isString } from './utils/utils.js'
 
 /**
- * @typedef {Object<string, HTMLElement | Array<HTMLElement>>} Refs
+ * @typedef {Object<string, HTMLElement>} Refs
  */
 
 /**
- * @typedef {(el: HTMLElement) => object?} Component
+ * @typedef {Object<string, Array<HTMLElement>>} RefsAll
+ */
+
+/**
+ * @typedef {(payload: { el: HTMLElement, refs: Refs, refsAll: RefsAll}) => object?} Component
  */
 
 /** @type {Object<string, Component>} */
@@ -37,9 +41,15 @@ export const registerComponent = (name, component) => {
  */
 export const mountComponent = (el, isChild = false) => {
   const component = getComponent(el)
+
+  const refsAll = getAllRefs(el)
+  const refs = Object.fromEntries(
+    Object.entries(refsAll).map(([key, value]) => [key, value[0]])
+  )
+
   if (component) {
     /* @ts-ignore */
-    el.$component = component(el) || {}
+    el.$component = component({ el, refs, refsAll }) || {}
   }
 
   if (!isChild) {
@@ -77,21 +87,19 @@ export const getInstance = el =>
 
 /**
  * @param {HTMLElement} el
- * @returns {Refs}
+ * @returns {RefsAll}
  */
-export const getRefs = el => {
-  /** @type {Refs} */
+const getAllRefs = el => {
+  /** @type {RefsAll} */
   const refs = {}
   walkComponent(el, el => {
     const { ref } = el.dataset
     if (ref) {
       const entry = refs[ref]
       if (!entry) {
-        refs[ref] = el
-      } else if (Array.isArray(entry)) {
-        entry.push(el)
+        refs[ref] = [el]
       } else {
-        refs[ref] = [entry, el]
+        entry.push(el)
       }
     }
   })
