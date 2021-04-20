@@ -1,5 +1,3 @@
-import { walkComponent, isString } from './utils/utils.js'
-
 /**
  * @typedef {Object<string, HTMLElement>} Refs
  */
@@ -21,6 +19,26 @@ const components = {}
  * @returns {Component}
  */
 const getComponent = el => components[el.dataset.component]
+
+/**
+ * @param {HTMLElement} el
+ * @param {(el: HTMLElement, isChildComponent: boolean) => any} callback
+ */
+export const walkComponent = (el, callback, isChild = false) => {
+  if (!isChild) {
+    callback(el, false)
+  }
+
+  let node = /** @type {HTMLElement} */ (el.firstElementChild)
+  while (node) {
+    if (!node.hasAttribute('data-very-ignore')) {
+      const isChildComponent = node.hasAttribute('data-component')
+      callback(node, isChildComponent)
+      !isChildComponent && walkComponent(node, callback, true)
+    }
+    node = /** @type {HTMLElement} */ (node.nextElementSibling)
+  }
+}
 
 /**
  * @param {string} name
@@ -77,13 +95,6 @@ const mountChildComponents = el => {
 export const mountComponents = (root = document.body) => {
   mountComponent(root)
 }
-
-/**
- * @param {string | HTMLElement} el An element (or an id).
- */
-export const getInstance = el =>
-  // @ts-ignore
-  (isString(el) ? document.getElementById(el) : el)?.__very_instance
 
 /**
  * @param {HTMLElement} el
