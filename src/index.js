@@ -58,16 +58,19 @@ export const registerComponent = (name, component) => {
  * @param {HTMLElement} el
  */
 export const mountComponent = (el, isChild = false) => {
-  const component = getComponent(el)
+  /* @ts-ignore */
+  // Don't re-initialize component.
+  if (!el.$component) {
+    const refsAll = getAllRefs(el)
+    const refs = Object.fromEntries(
+      Object.entries(refsAll).map(([key, value]) => [key, value[0]])
+    )
 
-  const refsAll = getAllRefs(el)
-  const refs = Object.fromEntries(
-    Object.entries(refsAll).map(([key, value]) => [key, value[0]])
-  )
-
-  if (component) {
-    /* @ts-ignore */
-    el.$component = component({ el, refs, refsAll }) || {}
+    const component = getComponent(el)
+    if (component) {
+      /* @ts-ignore */
+      el.$component = component({ el, refs, refsAll }) || {}
+    }
   }
 
   if (!isChild) {
@@ -80,11 +83,7 @@ const mountChildComponents = el => {
   const elements = el.querySelectorAll('[data-component]')
   for (let i = 0; i < elements.length; i++) {
     const el = /** @type {HTMLElement} */ (elements[i])
-    // Don't re-initialize components.
-    /* @ts-ignore */
-    if (!el.$component) {
-      mountComponent(el, true)
-    }
+    mountComponent(el, true)
   }
 }
 
@@ -93,7 +92,7 @@ const mountChildComponents = el => {
  * @param {HTMLElement} root - The containing element.
  */
 export const mountComponents = (root = document.body) => {
-  mountComponent(root)
+  mountChildComponents(root)
 }
 
 /**
