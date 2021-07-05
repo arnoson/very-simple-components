@@ -28,6 +28,19 @@ test('mounts multiple components', () => {
   expect(componentB).toBeCalledTimes(1)
 })
 
+test(`doesn't mount an already mounted component`, () => {
+  const component = jest.fn()
+  registerComponent('test', component)
+
+  const div = document.createElement('div')
+  div.dataset.component = 'test'
+
+  mountComponent(div)
+  mountComponent(div)
+
+  expect(component).toBeCalledTimes(1)
+})
+
 test('provides refs', () => {
   const component = jest.fn()
   registerComponent('test', component)
