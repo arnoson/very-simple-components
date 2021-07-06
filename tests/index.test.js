@@ -45,18 +45,19 @@ test(`doesn't mount an already mounted component`, () => {
   expect(component).toBeCalledTimes(1)
 })
 
-test(`doesn't mount elements with data-ignore attribute`, () => {
+test(`doesn't walk elements with data-ignore attribute`, () => {
   const component = jest.fn()
   registerComponent('test', component)
 
   document.body.innerHTML = `
-    <div data-component="test" data-ignore>
-      <div data-component="test"></div>
+    <div data-component="test">
+      <div data-ignore data-ref="ref">
+        <div data-ref="ref"></div>
+      </div>
     </div>
   `
-  mountComponents()
-
-  expect(component).toBeCalledTimes(0)
+  mountComponents(document.body)
+  expect(component).toBeCalledWith(expect.objectContaining({ refs: {} }))
 })
 
 test('provides refs', () => {
