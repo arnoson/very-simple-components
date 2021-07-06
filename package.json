@@ -7,7 +7,7 @@
   "types": "dist/types.d.ts",
   "files": [
     "dist/**/*",
-    "src/**.*"
+    "src/**/*"
   ],
   "scripts": {
     "build": "rm -rf ./dist && rollup --config --environment NODE_ENV:production",
