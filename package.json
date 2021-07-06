@@ -6,7 +6,8 @@
   "main": "src/index.js",
   "types": "dist/types.d.ts",
   "scripts": {
-    "build": "rm -rf ./dist && rollup --config --environment NODE_ENV:production ",
+    "build": "rm -rf ./dist && rollup --config --environment NODE_ENV:production",
+    "dev": " rollup --config --watch",
     "test": "jest"
   },
   "keywords": [
