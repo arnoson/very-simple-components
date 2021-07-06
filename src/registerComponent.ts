@@ -1,3 +1,5 @@
+import { Component } from './types'
+
 export const components: Record<string, Component> = {}
 export const getComponent = (el: HTMLElement) =>
   components[el.dataset.component]

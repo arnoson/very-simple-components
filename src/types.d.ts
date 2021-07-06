@@ -1,7 +1,7 @@
-type Refs = Record<string, HTMLElement>
-type RefsAll = Record<string, HTMLElement[]>
+export type Refs = Record<string, HTMLElement>
+export type RefsAll = Record<string, HTMLElement[]>
 
-type Component = (payload: {
+export type Component = (payload: {
   el: HTMLElement
   refs: Refs
   refsAll: RefsAll
