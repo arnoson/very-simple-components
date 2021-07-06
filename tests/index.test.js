@@ -1,4 +1,8 @@
-import { registerComponent, mountComponent, mountComponents } from '../src'
+import {
+  registerComponent,
+  mountComponent,
+  mountComponents
+} from '../dist/index.es.js'
 
 test('mounts a component', () => {
   const component = jest.fn()

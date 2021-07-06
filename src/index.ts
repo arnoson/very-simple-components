@@ -1,51 +1,35 @@
-/**
- * @typedef {Object<string, HTMLElement>} Refs
- */
+type Refs = Record<string, HTMLElement>
+type RefsAll = Record<string, HTMLElement[]>
+type Component = (payload: {
+  el: HTMLElement
+  refs: Refs
+  refsAll: RefsAll
+}) => any
 
-/**
- * @typedef {Object<string, Array<HTMLElement>>} RefsAll
- */
+const components: Record<string, Component> = {}
+const getComponent = (el: HTMLElement) => components[el.dataset.component]
 
-/**
- * @typedef {(payload: { el: HTMLElement, refs: Refs, refsAll: RefsAll}) => object?} Component
- */
-
-/** @type {Object<string, Component>} */
-const components = {}
-
-/**
- * @private
- * @param {HTMLElement} el
- * @returns {Component}
- */
-const getComponent = el => components[el.dataset.component]
-
-/**
- * @param {HTMLElement} el
- * @param {(el: HTMLElement, isChildComponent: boolean) => any} callback
- */
-export const walkComponent = (el, callback, isChild = false) => {
+export const walkComponent = (
+  el: HTMLElement,
+  callback: (el: HTMLElement, isChildComponent: boolean) => any,
+  isChild = false
+) => {
   if (!isChild) {
     callback(el, false)
   }
 
-  let node = /** @type {HTMLElement} */ (el.firstElementChild)
+  let node = el.firstElementChild as HTMLElement
   while (node) {
     if (!node.hasAttribute('data-very-ignore')) {
       const isChildComponent = node.hasAttribute('data-component')
       callback(node, isChildComponent)
       !isChildComponent && walkComponent(node, callback, true)
     }
-    node = /** @type {HTMLElement} */ (node.nextElementSibling)
+    node = node.nextElementSibling as HTMLElement
   }
 }
 
-/**
- * @param {string} name
- * @param {Component} component
- * @returns {Component}
- */
-export const registerComponent = (name, component) => {
+export const registerComponent = (name: string, component: Component) => {
   if (typeof component !== 'function') {
     throw new Error(`Component ${name} is not a function.`)
   }
@@ -55,9 +39,8 @@ export const registerComponent = (name, component) => {
 
 /**
  * Mount a single component.
- * @param {HTMLElement} el
  */
-export const mountComponent = (el, isChild = false) => {
+export const mountComponent = (el: HTMLElement, isChild = false) => {
   /* @ts-ignore */
   // Don't re-initialize component.
   if (!el.$component) {
@@ -78,30 +61,24 @@ export const mountComponent = (el, isChild = false) => {
   }
 }
 
-/** @param {HTMLElement} el */
-const mountChildComponents = el => {
-  const elements = el.querySelectorAll('[data-component]')
+const mountChildComponents = (el: HTMLElement) => {
+  const elements = el.querySelectorAll<HTMLElement>('[data-component]')
   for (let i = 0; i < elements.length; i++) {
-    const el = /** @type {HTMLElement} */ (elements[i])
+    const el = /** @type {HTMLElement} */ elements[i]
     mountComponent(el, true)
   }
 }
 
 /**
  * Mount all components inside the element.
- * @param {HTMLElement} root - The containing element.
  */
 export const mountComponents = (root = document.body) => {
   mountChildComponents(root)
 }
 
-/**
- * @param {HTMLElement} el
- * @returns {RefsAll}
- */
-const getAllRefs = el => {
+const getAllRefs = (el: HTMLElement) => {
   /** @type {RefsAll} */
-  const refs = {}
+  const refs: RefsAll = {}
   walkComponent(el, el => {
     const { ref } = el.dataset
     if (ref) {

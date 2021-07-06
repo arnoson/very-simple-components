@@ -1,10 +1,11 @@
 {
   "compilerOptions": {
     "checkJs": true,
-    "lib": ["es6", "dom"]
+    "lib": ["es2019", "dom"]
   },
   "typeAcquisition": {
     "include": ["jest"]
   },
+  "include": ["src/**/*"],
   "exclude": ["dist"]
 }
