@@ -28,7 +28,7 @@ export const mountComponent = (el: HTMLElement, isChild = false) => {
 export const mountChildComponents = (el: HTMLElement) => {
   const elements = el.querySelectorAll<HTMLElement>('[data-component]')
   for (let i = 0; i < elements.length; i++) {
-    const el = /** @type {HTMLElement} */ elements[i]
+    const el = elements[i]
     mountComponent(el, true)
   }
 }
