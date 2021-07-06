@@ -45,6 +45,20 @@ test(`doesn't mount an already mounted component`, () => {
   expect(component).toBeCalledTimes(1)
 })
 
+test(`doesn't mount elements with data-ignore attribute`, () => {
+  const component = jest.fn()
+  registerComponent('test', component)
+
+  document.body.innerHTML = `
+    <div data-component="test" data-ignore>
+      <div data-component="test"></div>
+    </div>
+  `
+  mountComponents()
+
+  expect(component).toBeCalledTimes(0)
+})
+
 test('provides refs', () => {
   const component = jest.fn()
   registerComponent('test', component)
