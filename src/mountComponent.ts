@@ -5,9 +5,8 @@ import { getComponent } from './registerComponent'
  * Mount a single component.
  */
 export const mountComponent = (el: HTMLElement, isChild = false) => {
-  /* @ts-ignore */
   // Don't re-initialize component.
-  if (!el.$component) {
+  if (!(el as any).$component) {
     const refsAll = getAllRefs(el)
     const refs = Object.fromEntries(
       Object.entries(refsAll).map(([key, value]) => [key, value[0]])
@@ -15,8 +14,7 @@ export const mountComponent = (el: HTMLElement, isChild = false) => {
 
     const component = getComponent(el)
     if (component) {
-      /* @ts-ignore */
-      el.$component = component({ el, refs, refsAll }) || {}
+      ;(el as any).$component = component({ el, refs, refsAll }) || {}
     }
   }
 
