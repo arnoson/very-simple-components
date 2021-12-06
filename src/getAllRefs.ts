@@ -6,12 +6,8 @@ export const getAllRefs = (el: HTMLElement) => {
   walkComponent(el, el => {
     const { ref } = el.dataset
     if (ref) {
-      const entry = refs[ref]
-      if (!entry) {
-        refs[ref] = [el]
-      } else {
-        entry.push(el)
-      }
+      refs[ref] ??= []
+      refs[ref].push(el)
     }
   })
   return refs
