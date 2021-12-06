@@ -3,16 +3,14 @@ export const walkComponent = (
   callback: (el: HTMLElement, isChildComponent: boolean) => any,
   isChild = false
 ) => {
-  if (!isChild) {
-    callback(el, false)
-  }
+  if (!isChild) callback(el, false)
 
   let node = el.firstElementChild as HTMLElement
   while (node) {
     if (!node.hasAttribute('data-ignore')) {
       const isChildComponent = node.hasAttribute('data-component')
       callback(node, isChildComponent)
-      !isChildComponent && walkComponent(node, callback, true)
+      if (!isChildComponent) walkComponent(node, callback, true)
     }
     node = node.nextElementSibling as HTMLElement
   }
