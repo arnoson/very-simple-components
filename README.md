@@ -53,7 +53,7 @@ registerComponent('gallery', ({ el, ref, refs }) => {
 </div>
 
 <script type="module">
-  import { mountComponents } from 'very-simple-components'
+  import { mountComponents } from '@very-simple/components'
   // We only have to import the component, it will register itself.
   import './components/gallery.js'
 
