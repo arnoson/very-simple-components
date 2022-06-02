@@ -1,15 +1,19 @@
 {
-  "name": "very-simple-components",
-  "version": "0.2.1",
+  "name": "@very-simple/components",
+  "version": "0.0.0",
   "description": "A very simple way to attach javascript to the DOM",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/types.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/very-simple/components.git"
+  },
   "files": [
     "dist/**"
   ],
   "scripts": {
-    "build": "shx rm -rf ./dist && tsup src/index.ts src/useRouter.ts --dts --format esm",
+    "build": "shx rm -rf ./dist && tsup src/index.ts --dts --format esm",
     "dev": "vite",
     "prepublishOnly": "npm run build",
     "release": "np --no-2fa",
