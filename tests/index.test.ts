@@ -1,11 +1,8 @@
-import {
-  registerComponent,
-  mountComponent,
-  mountComponents
-} from '../dist/index.es.js'
+import { it, expect, vi } from 'vitest'
+import { registerComponent, mountComponent, mountComponents } from '../src'
 
-test('mounts a component', () => {
-  const component = jest.fn()
+it('mounts a component', () => {
+  const component = vi.fn()
   registerComponent('test', component)
 
   const div = document.createElement('div')
@@ -15,11 +12,11 @@ test('mounts a component', () => {
   expect(component).toBeCalledWith({ el: div, refs: {}, refsAll: {} })
 })
 
-test('mounts multiple components', () => {
-  const componentA = jest.fn()
+it('mounts multiple components', () => {
+  const componentA = vi.fn()
   registerComponent('a', componentA)
 
-  const componentB = jest.fn()
+  const componentB = vi.fn()
   registerComponent('b', componentB)
 
   document.body.innerHTML = `
@@ -32,8 +29,8 @@ test('mounts multiple components', () => {
   expect(componentB).toBeCalledTimes(1)
 })
 
-test(`doesn't mount an already mounted component`, () => {
-  const component = jest.fn()
+it(`doesn't mount an already mounted component`, () => {
+  const component = vi.fn()
   registerComponent('test', component)
 
   const div = document.createElement('div')
@@ -45,8 +42,8 @@ test(`doesn't mount an already mounted component`, () => {
   expect(component).toBeCalledTimes(1)
 })
 
-test(`doesn't walk elements with data-ignore attribute`, () => {
-  const component = jest.fn()
+it(`doesn't walk elements with data-ignore attribute`, () => {
+  const component = vi.fn()
   registerComponent('test', component)
 
   document.body.innerHTML = `
@@ -60,8 +57,8 @@ test(`doesn't walk elements with data-ignore attribute`, () => {
   expect(component).toBeCalledWith(expect.objectContaining({ refs: {} }))
 })
 
-test('provides refs', () => {
-  const component = jest.fn()
+it('provides refs', () => {
+  const component = vi.fn()
   registerComponent('test', component)
 
   document.body.innerHTML = `
@@ -83,8 +80,8 @@ test('provides refs', () => {
   )
 })
 
-test('provides refsAll', () => {
-  const component = jest.fn()
+it('provides refsAll', () => {
+  const component = vi.fn()
   registerComponent('test', component)
 
   document.body.innerHTML = `
