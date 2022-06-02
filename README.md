@@ -1,5 +1,7 @@
 # Very Simple Components
 
+This Repo has moved to: https://github.com/very-simple/components
+
 A tiny library that helps you to register javascript logic on the HTML you already have. Like a very simplified version of [alpine.js](https://github.com/alpinejs/alpine/) or [stimulus](https://github.com/hotwired/stimulus).
 
 ## Example
