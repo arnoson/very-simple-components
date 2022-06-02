@@ -7,8 +7,8 @@ export const walkComponent = (
 
   let node = el.firstElementChild as HTMLElement
   while (node) {
-    if (!node.hasAttribute('data-ignore')) {
-      const isChildComponent = node.hasAttribute('data-component')
+    if (!node.hasAttribute('data-simple-ignore')) {
+      const isChildComponent = node.hasAttribute('data-simple-component')
       callback(node, isChildComponent)
       if (!isChildComponent) walkComponent(node, callback, true)
     }

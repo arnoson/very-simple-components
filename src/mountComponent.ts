@@ -1,39 +1,47 @@
-import { getAllRefs } from './getAllRefs'
 import { getComponent } from './registerComponent'
+import { ComponentPayload } from './types'
+import { walkComponent } from './walkComponent'
 
-/**
- * Mount a single component.
- */
-export const mountComponent = (el: HTMLElement, isChild = false) => {
-  // Don't re-initialize component.
-  if (!(el as any).$component) {
-    const refsAll = getAllRefs(el)
-    const refs = Object.fromEntries(
-      Object.entries(refsAll).map(([key, value]) => [key, value[0]])
-    )
-
-    const component = getComponent(el)
-    if (component) {
-      ;(el as any).$component = component({ el, refs, refsAll }) || {}
+type Refs = ComponentPayload['refs']
+const getRefs = (el: HTMLElement): Refs => {
+  const refs: Refs = {}
+  walkComponent(el, el => {
+    const { ref } = el.dataset
+    if (ref) {
+      refs[ref] ??= []
+      refs[ref].push(el)
     }
-  }
-
-  if (!isChild) {
-    mountChildComponents(el)
-  }
+  })
+  return refs
 }
 
-export const mountChildComponents = (el: HTMLElement) => {
-  const elements = el.querySelectorAll<HTMLElement>('[data-component]')
+const mountChildComponents = (el: HTMLElement) => {
+  const elements = el.querySelectorAll<HTMLElement>('[data-simple-component]')
   for (let i = 0; i < elements.length; i++) {
     const el = elements[i]
     mountComponent(el, true)
   }
 }
 
-/**
- * Mount all components inside the element.
- */
+/** Mount a single component */
+export const mountComponent = (el: HTMLElement, isChild = false) => {
+  // Don't re-initialize component.
+  if (!el.$component) {
+    const refs = getRefs(el)
+    const ref = Object.fromEntries(
+      Object.entries(refs).map(([key, value]) => [key, value[0]])
+    )
+
+    const component = getComponent(el)
+    if (component) {
+      el.$component = component({ el, ref, refs }) || {}
+    }
+  }
+
+  if (!isChild) mountChildComponents(el)
+}
+
+/** Mount all components inside the element */
 export const mountComponents = (root = document.body) => {
   mountChildComponents(root)
 }

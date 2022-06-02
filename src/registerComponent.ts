@@ -1,8 +1,10 @@
 import { Component } from './types'
 
 export const components: Record<string, Component> = {}
-export const getComponent = (el: HTMLElement) =>
-  components[el.dataset.component]
+export const getComponent = (el: HTMLElement) => {
+  const name = el.dataset.simpleComponent
+  return name ? components[name] : undefined
+}
 
 export const registerComponent = (name: string, component: Component) => {
   if (typeof component !== 'function') {
