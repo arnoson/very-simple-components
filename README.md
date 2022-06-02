@@ -65,7 +65,19 @@ registerComponent('gallery', ({ el, ref, refs }) => {
 
 ## Documentation
 
-### Mount a single component
+### Register a Component
+
+```ts
+registerComponent(name: string, component: Component)
+
+type Component = (payload: {
+  el: HTMLElement
+  ref: Record<string, HTMLElement>
+  refs: Record<string, HTMLElement[]>
+}) => any
+```
+
+### Mount a single Component
 
 Note: this will also mount any child components.
 
@@ -73,14 +85,14 @@ Note: this will also mount any child components.
 mountComponent(el: HTMLElement)
 ```
 
-### Mount all components
+### Mount all Components
 
 ```ts
 // If no `root` is provided, `<body>` is used.
 mountComponent(root?: HTMLElement)
 ```
 
-### Ignore elements
+### Ignore Elements
 
 Sometimes it is useful to skip big DOM elements when searching for components
 to mount:
@@ -91,7 +103,7 @@ to mount:
 </div>
 ```
 
-### Expose component methods
+### Expose Component Methods
 
 Everything you return from the component function is available on the HTML
 element's `$component` property:
