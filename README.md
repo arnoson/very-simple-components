@@ -1,20 +1,28 @@
-# Very Simple Components
+# ♻️ Very Simple Components
 
-A tiny library that helps you to register javascript logic on the HTML you already have. Like a very simplified version of [alpine.js](https://github.com/alpinejs/alpine/) or [stimulus](https://github.com/hotwired/stimulus).
+A very simple way to attach javascript to the DOM. When even [petite-vue](https://github.com/vuejs/petite-vue) or [alpine.js](https://github.com/alpinejs/alpine/) would be too much.
+
+💾 less than 0.5kb (minify and gzip)
+
+## Installation
+
+```
+npm i @very-simple/components
+```
 
 ## Example
 
 ```js
 // components/gallery.js
 
-import { registerComponent } from 'very-simple-components'
+import { registerComponent } from '@very-simple/components'
 
-registerComponent('gallery', ({ el, refs, refsAll }) => {
+registerComponent('gallery', ({ el, ref, refs }) => {
   // Multiple HTML elements can have the same `ref` name. They will be
-  // grouped in `refsAll`.
-  const { slides } = refsAll
-  // Normal refs, that occur only once in your component, are stored in `refs`.
-  const { prev, next } = refs
+  // grouped in `refs` ...
+  const { slides } = refs
+  // ... whereas `ref` only stores a single element per name.
+  const { prev, next } = ref
 
   let currentIndex = 0
   const maxIndex = slides.length - 1
@@ -36,7 +44,7 @@ registerComponent('gallery', ({ el, refs, refsAll }) => {
 ```html
 <!-- index.html -->
 
-<div id="my-gallery" data-component="gallery">
+<div id="my-gallery" data-simple-component="gallery">
   <div data-ref="slides">A</div>
   <div data-ref="slides">B</div>
   <div data-ref="slides">C</div>
@@ -49,14 +57,56 @@ registerComponent('gallery', ({ el, refs, refsAll }) => {
   // We only have to import the component, it will register itself.
   import './components/gallery.js'
 
-  // This will look for any elements with a `data-component` attribute and
+  // This will look for any elements with a `data-simple-component` attribute and
   // mount the corresponding component.
   mountComponents()
 </script>
 ```
 
-## Why?
+## Documentation
 
-Although frameworks like alpine.js or stimulus are meant to work with the HTML you already have, I needed something even simpler. Very Simple Components is targeted especially to static sites where we don't need component life cycles. Also for some websites even directives, registering event handlers in markup and many other advanced features are sometimes overkill.
+### Mount a single component
 
-Very Simple Components just gives you a way to easily attach your javascript logic to HTML elements, and provides refs to more quickly access HTML elements within your component root. That's it ;)
+Note: this will also mount any child components.
+
+```ts
+mountComponent(el: HTMLElement)
+```
+
+### Mount all components
+
+```ts
+// If no `root` is provided, `<body>` is used.
+mountComponent(root?: HTMLElement)
+```
+
+### Ignore elements
+
+Sometimes it is useful to skip big DOM elements when searching for components
+to mount:
+
+```html
+<div data-simple-ignore>
+  <!-- a lot of DOM elements ... -->
+</div>
+```
+
+### Expose component methods
+
+Everything you return from the component function is available on the HTML
+element's `$component` property:
+
+```js
+registerComponent('my-component', () => {
+  const sayHello = () => console.log('Hello :~)')
+  return { sayHello }
+})
+```
+
+```html
+<div data-simple-component="my-component" id="my-id"></div>
+```
+
+```js
+document.getElementById('my-id').$component.sayHello()
+```
