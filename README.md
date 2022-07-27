@@ -125,7 +125,7 @@ const props = defineProps({
   tags: () => ['default']
 })
 
-export default registerComponent('my-component', ({ el }) => {
+registerComponent('my-component', ({ el }) => {
   const { enabled, message, tags } = props(el)
 })
 ```
