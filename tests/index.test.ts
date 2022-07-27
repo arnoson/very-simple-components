@@ -1,5 +1,10 @@
 import { it, expect, vi } from 'vitest'
-import { registerComponent, mountComponent, mountComponents } from '../src'
+import {
+  registerComponent,
+  mountComponent,
+  mountComponents,
+  defineProps
+} from '../src'
 
 it('mounts a component', () => {
   const component = vi.fn()
@@ -96,6 +101,65 @@ it('provides a record of groups of refs with the same name', () => {
   expect(component).toBeCalledWith(expect.objectContaining({ refs: { myRef } }))
 })
 
+it(`parses props`, () => {
+  document.body.innerHTML = `
+    <div
+      data-number="1"
+      data-string="text"
+      data-bool="true"
+      data-array="[1,2,3]"
+      data-obj='{ "hello": "world" }'
+    ></div>
+  `
+  const el = document.querySelector('div')
+  const readProps = defineProps({
+    number: Number,
+    string: String,
+    bool: Boolean,
+    array: Array,
+    obj: Object
+  })
+
+  expect(readProps(el!)).toMatchSnapshot()
+})
+
+it(`provides default values for props`, () => {
+  document.body.innerHTML = `<div></div>`
+  const el = document.querySelector('div')
+
+  const readProps = defineProps({
+    number: 10,
+    string: 'hello',
+    bool: true,
+    array: () => [],
+    obj: () => ({})
+  })
+
+  expect(readProps(el!)).toMatchSnapshot()
+})
+
+it('interferes prop types from default values', () => {
+  document.body.innerHTML = `
+    <div
+      data-number="1"
+      data-string="text"
+      data-bool="true"
+      data-array="[1,2,3]"
+      data-obj='{ "hello": "world" }'
+    ></div>
+  `
+  const el = document.querySelector('div')
+  const readProps = defineProps({
+    number: 42,
+    string: 'default',
+    bool: false,
+    array: () => [],
+    obj: () => ({})
+  })
+
+  expect(readProps(el!)).toMatchSnapshot()
+})
+
 it(`exposes the component function's return value`, () => {
   const exposed = { test: () => {} }
   registerComponent('test', () => exposed)
@@ -104,5 +168,5 @@ it(`exposes the component function's return value`, () => {
     <div data-simple-component="test" id="my-id"></div>
   `
   mountComponents(document.body)
-  expect(document.getElementById('my-id').$component).toBe(exposed)
+  expect(document.getElementById('my-id')?.$component).toBe(exposed)
 })

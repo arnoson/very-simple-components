@@ -2,7 +2,7 @@
 
 A very simple way to attach javascript to the DOM. When even [petite-vue](https://github.com/vuejs/petite-vue) or [alpine.js](https://github.com/alpinejs/alpine/) would be too much.
 
-💾 less than 0.5kb (minify and gzip)
+💾 ~ 0.6kb (minify and gzip)
 
 ## Installation
 
@@ -15,12 +15,18 @@ npm i @very-simple/components
 ```js
 // components/gallery.js
 
-import { registerComponent } from '@very-simple/components'
+import { registerComponent, defineProps } from '@very-simple/components'
 
+const props = defineProps({ loop: Boolean })
 registerComponent('gallery', ({ el, ref, refs }) => {
+  // Props are read from el's dataset and automatically converted to the correct
+  // type. Default values are also possible, see documentation.
+  const { loop } = props(el)
+
   // Multiple HTML elements can have the same `ref` name. They will be
   // grouped in `refs` ...
   const { slides } = refs
+
   // ... whereas `ref` only stores a single element per name.
   const { prev, next } = ref
 
@@ -28,6 +34,8 @@ registerComponent('gallery', ({ el, ref, refs }) => {
   const maxIndex = slides.length - 1
 
   const selectSlide = index => {
+    if (!loop && (index < 0 || index > maxIndex)) return
+
     currentIndex = index < 0 ? maxIndex : index > maxIndex ? 0 : index
     slides.forEach((el, index) => (el.hidden = index !== currentIndex))
   }
@@ -44,7 +52,7 @@ registerComponent('gallery', ({ el, ref, refs }) => {
 ```html
 <!-- index.html -->
 
-<div id="my-gallery" data-simple-component="gallery">
+<div id="my-gallery" data-simple-component="gallery" data-loop="true">
   <div data-ref="slides">A</div>
   <div data-ref="slides">B</div>
   <div data-ref="slides">C</div>
@@ -90,6 +98,44 @@ mountComponent(el: HTMLElement)
 ```ts
 // If no `root` is provided, `<body>` is used.
 mountComponent(root?: HTMLElement)
+```
+
+### Define Props
+
+Define properties to automatically convert `el.dataset` properties to the
+correct type and enable autocompletion.
+
+```ts
+// You can either define a prop's type by proving a constructor ...
+defineProps({ answer: Number, enabled: Boolean })
+
+// ... or by providing a default value.
+defineProps({ answer: 42, enabled: true })
+
+// For objects and arrays the default value can be wrapped inside a function
+defineProps({ list: () => [1, 2, 3] })
+```
+
+Example:
+
+```ts
+const props = defineProps({
+  enabled: true,
+  message: String,
+  tags: () => ['default']
+})
+
+export default registerComponent('my-component', ({ el }) => {
+  const { enabled, message, tags } = props(el)
+})
+```
+
+```html
+<div
+  data-simple-component="my-component"
+  data-message="Hello"
+  data-tags='[ "very", "simple", "components" ]'
+></div>
 ```
 
 ### Ignore Elements
