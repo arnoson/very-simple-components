@@ -85,6 +85,13 @@ type Component = (payload: {
 }) => any
 ```
 
+You can also use a sub type of `HTMLElement`, for example if you are using
+a component only for `HTMLImageElement`:
+
+```ts
+registerComponent<HTMLImageElement>('my-image', ({ el }) => (el.src = '...'))
+```
+
 ### Mount a single Component
 
 Note: this will also mount any child components.

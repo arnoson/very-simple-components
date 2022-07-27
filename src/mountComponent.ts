@@ -2,7 +2,7 @@ import { getComponent } from './registerComponent'
 import { ComponentPayload } from './types'
 import { walkComponent } from './walkComponent'
 
-type Refs = ComponentPayload['refs']
+type Refs = ComponentPayload<any>['refs']
 const getRefs = (el: HTMLElement): Refs => {
   const refs: Refs = {}
   walkComponent(el, el => {

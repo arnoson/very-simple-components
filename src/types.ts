@@ -4,10 +4,10 @@ declare global {
   }
 }
 
-export interface ComponentPayload {
-  el: HTMLElement
+export interface ComponentPayload<T> {
+  el: T
   ref: Record<string, HTMLElement>
   refs: Record<string, HTMLElement[]>
 }
 
-export type Component = (payload: ComponentPayload) => any
+export type Component<T> = (payload: ComponentPayload<T>) => any
