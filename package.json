@@ -32,10 +32,10 @@
   "license": "MIT",
   "devDependencies": {
     "jsdom": "^20.0.0",
-    "np": "^7.6.1",
+    "np": "^7.6.2",
     "shx": "^0.3.4",
     "tsup": "^6.0.1",
     "vite": "^3.0.0",
-    "vitest": "^0.19.1"
+    "vitest": "^0.23.0"
   }
 }
