@@ -80,16 +80,9 @@ registerComponent(name: string, component: Component)
 
 type Component = (payload: {
   el: HTMLElement
-  ref: Record<string, HTMLElement>
+  ref: Record<string, HTMLElement | undefined>
   refs: Record<string, HTMLElement[]>
 }) => any
-```
-
-You can also use a sub type of `HTMLElement`, for example if you are using
-a component only for `HTMLImageElement`:
-
-```ts
-registerComponent<HTMLImageElement>('my-image', ({ el }) => (el.src = '...'))
 ```
 
 ### Mount a single Component
@@ -174,4 +167,40 @@ registerComponent('my-component', () => {
 
 ```js
 document.getElementById('my-id').$component.sayHello()
+```
+
+With typescript you can also get autocompletion:
+
+```ts
+// my-component.ts
+export default registerComponent('my-component', () => {
+  const sayHello = () => console.log('Hello :~)')
+  return { sayHello }
+})
+
+// index.ts
+import MyComponent from './my-component.ts'
+import type { SimpleElement } from '@very-simple/components'
+
+const el = document.getElementById<SimpleElement<typeof MyComponent>>('my-id')
+
+el.$component.sayHello() // <- this gets autocompleted
+```
+
+### Define Ref(s) Types
+
+Refs are of type HTMLElement by default, but it can be useful to define a more
+specific type for some of them:
+
+```ts
+import type { DefineRef, DefineRefs } from '@very-simple/components'
+
+registerComponent('my-component', ({ refs, ref }) => {
+  const { slides, videos } = refs as DefineRefs<{ videos: HTMLVideoElement[] }>
+  // slides -> HTMLElement[]
+  // videos -> HTMLVideoElement[]
+  const { container, img } = ref as DefineRef<{ img: HTMLImageElement }>
+  // container -> HTMLElement
+  // img -> HTMLImageElement
+})
 ```
