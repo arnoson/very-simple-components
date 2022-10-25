@@ -28,7 +28,7 @@ const parse = (value: any, type: string) =>
 const getDefaultValue = (definition: any) =>
   definition instanceof Function ? definition() : definition
 
-export const defineProps = <T>(definitions: T) => {
+export const defineProps = <T extends Record<string, any>>(definitions: T) => {
   return (el: HTMLElement) => {
     const props = Object.fromEntries(
       Object.entries(definitions).map(([key, definition]) => {

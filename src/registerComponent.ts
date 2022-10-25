@@ -1,14 +1,17 @@
-import { Component } from './types'
+import { SimpleComponent } from './types'
 
-export const components: Record<string, Component<any>> = {}
+export const components: Record<string, SimpleComponent<any>> = {}
 export const getComponent = (el: HTMLElement) => {
   const name = el.dataset.simpleComponent
   return name ? components[name] : undefined
 }
 
-export const registerComponent = <T extends HTMLElement>(
+export const registerComponent = <
+  T extends HTMLElement,
+  C extends SimpleComponent<T>
+>(
   name: string,
-  component: Component<T>
+  component: C
 ) => {
   if (typeof component !== 'function') {
     throw new Error(`Component ${name} is not a function.`)
