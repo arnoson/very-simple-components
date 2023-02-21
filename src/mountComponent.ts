@@ -1,5 +1,5 @@
 import { getComponent } from './registerComponent'
-import { SimpleRefs, SimpleRefsAll } from './types'
+import { SimpleElement, SimpleRefs, SimpleRefsAll } from './types'
 import { walkComponent } from './walkComponent'
 
 const getRefsAll = (el: HTMLElement): SimpleRefsAll => {
@@ -33,7 +33,10 @@ export const mountComponent = (el: HTMLElement, isChild = false) => {
 
     const component = getComponent(el)
     if (component) {
-      ;(el as any).$component = component({ el, refs, refsAll }) || {}
+      const simpleEl = el as SimpleElement<ReturnType<typeof component>>
+      simpleEl.$component = component({ el, refs, refsAll }) || {}
+      simpleEl.$refs = refs
+      simpleEl.$refsAll = refsAll
     }
   }
 

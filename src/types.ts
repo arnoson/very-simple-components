@@ -10,6 +10,8 @@ export type SimpleInstance<C extends SimpleComponent> = ReturnType<C>
 
 export type SimpleElement<C extends SimpleComponent, T = HTMLElement> = T & {
   $component: SimpleInstance<C>
+  $refs: SimpleRefs,
+  $refsAll: SimpleRefsAll
 }
 
 export interface SimpleComponentPayload<T> {

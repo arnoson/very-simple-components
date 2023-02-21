@@ -161,6 +161,40 @@ it('interferes prop types from default values', () => {
   expect(readProps(el!)).toMatchSnapshot()
 })
 
+it(`exposes the component's refs`, () => {
+  const component = registerComponent('test', () => {})
+
+  document.body.innerHTML = `
+    <div data-simple-component="test" id="my-id">
+      <div id="ref" data-ref="ref"></div>
+    </div>
+  `
+  const refs = { ref: document.getElementById('ref') }
+  mountComponents(document.body)
+  const el = document.getElementById('my-id') as SimpleElement<typeof component>
+  expect(el.$refs).toEqual(refs)
+})
+
+it(`exposes the component's refsAll`, () => {
+  const component = registerComponent('test', () => {})
+
+  document.body.innerHTML = `
+    <div data-simple-component="test" id="my-id">
+      <div id="ref1" data-ref="myRef"></div>
+      <div id="ref2" data-ref="myRef"></div>
+    </div>
+  `
+
+  const myRef = [
+    document.getElementById('ref1'),
+    document.getElementById('ref2'),
+  ]
+
+  mountComponents(document.body)
+  const el = document.getElementById('my-id') as SimpleElement<typeof component>
+  expect(el.$refsAll).toEqual({ myRef })
+})
+
 it(`exposes the component function's return value`, () => {
   const exposed = { test: () => {} }
   const component = registerComponent('test', () => exposed)
