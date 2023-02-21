@@ -3,7 +3,8 @@ import {
   registerComponent,
   mountComponent,
   mountComponents,
-  defineProps
+  defineProps,
+  SimpleElement
 } from '../src'
 
 it('mounts a component', () => {
@@ -162,11 +163,13 @@ it('interferes prop types from default values', () => {
 
 it(`exposes the component function's return value`, () => {
   const exposed = { test: () => {} }
-  registerComponent('test', () => exposed)
+  const component = registerComponent('test', () => exposed)
 
   document.body.innerHTML = `
     <div data-simple-component="test" id="my-id"></div>
   `
+
   mountComponents(document.body)
-  expect(document.getElementById('my-id')?.$component).toBe(exposed)
+  const el = document.getElementById('my-id') as SimpleElement<typeof component>
+  expect(el.$component).toBe(exposed)
 })
