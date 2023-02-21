@@ -15,7 +15,7 @@ it('mounts a component', () => {
   div.dataset.simpleComponent = 'test'
 
   mountComponent(div)
-  expect(component).toBeCalledWith({ el: div, ref: {}, refs: {} })
+  expect(component).toBeCalledWith({ el: div, refs: {}, refsAll: {} })
 })
 
 it('mounts multiple components', () => {
@@ -63,7 +63,7 @@ it(`doesn't walk elements with data-simple-ignore attribute`, () => {
   expect(component).toBeCalledWith(expect.objectContaining({ refs: {} }))
 })
 
-it.only('provides a record of single refs', () => {
+it('provides a record of single refs', () => {
   const component = vi.fn()
   registerComponent('test', component)
 
@@ -82,7 +82,7 @@ it.only('provides a record of single refs', () => {
   expect(component).toBeCalledWith(expect.objectContaining({ refs: { myRef } }))
 })
 
-it.only('provides a record of groups of refs with the same name', () => {
+it('provides a record of groups of refs with the same name', () => {
   const component = vi.fn()
   registerComponent('test', component)
 
