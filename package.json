@@ -16,7 +16,7 @@
     "build": "shx rm -rf ./dist && tsup src/index.ts --dts --format esm",
     "dev": "vite",
     "prepublishOnly": "npm run build",
-    "release": "np --no-2fa",
+    "release": "tsc --noEmit && bumpp --all",
     "test": "vitest run",
     "test-dev": "vitest watch"
   },
@@ -31,8 +31,8 @@
   "author": "arnoson",
   "license": "MIT",
   "devDependencies": {
+    "bumpp": "^8.2.1",
     "jsdom": "^20.0.0",
-    "np": "^7.6.2",
     "shx": "^0.3.4",
     "tsup": "^6.0.1",
     "typescript": "^4.8.4",
