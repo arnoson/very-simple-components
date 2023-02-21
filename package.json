@@ -16,9 +16,10 @@
     "build": "shx rm -rf ./dist && tsup src/index.ts --dts --format esm",
     "dev": "vite",
     "prepublishOnly": "npm run build",
-    "release": "tsc --noEmit && bumpp --all",
+    "release": "bumpp --all",
     "test": "vitest run",
-    "test-dev": "vitest watch"
+    "test:dev": "vitest watch",
+    "test:types": "tsc --noEmit"
   },
   "keywords": [
     "components",
