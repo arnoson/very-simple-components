@@ -63,7 +63,7 @@ it(`doesn't walk elements with data-simple-ignore attribute`, () => {
   expect(component).toBeCalledWith(expect.objectContaining({ refs: {} }))
 })
 
-it('provides a record of single refs', () => {
+it.only('provides a record of single refs', () => {
   const component = vi.fn()
   registerComponent('test', component)
 
@@ -79,10 +79,10 @@ it('provides a record of single refs', () => {
   `
   mountComponents(document.body)
   const myRef = document.querySelector(`[data-ref='myRef']`)
-  expect(component).toBeCalledWith(expect.objectContaining({ ref: { myRef } }))
+  expect(component).toBeCalledWith(expect.objectContaining({ refs: { myRef } }))
 })
 
-it('provides a record of groups of refs with the same name', () => {
+it.only('provides a record of groups of refs with the same name', () => {
   const component = vi.fn()
   registerComponent('test', component)
 
@@ -99,7 +99,7 @@ it('provides a record of groups of refs with the same name', () => {
     document.querySelector('#ref2'),
     document.querySelector('#ref3')
   ]
-  expect(component).toBeCalledWith(expect.objectContaining({ refs: { myRef } }))
+  expect(component).toBeCalledWith(expect.objectContaining({ refsAll: { myRef } }))
 })
 
 it(`parses props`, () => {

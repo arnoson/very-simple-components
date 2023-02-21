@@ -1,10 +1,10 @@
-export type SimpleRef = Record<string, HTMLElement | undefined>
+export type SimpleRefs = Record<string, HTMLElement | undefined>
 
-export type SimpleRefs = Record<string, HTMLElement[]>
+export type SimpleRefsAll = Record<string, HTMLElement[]>
 
-export type DefineRef<T> = SimpleRef & Partial<T>
+export type DefineRefs<T> = SimpleRefs & Partial<T>
 
-export type DefineRefs<T> = SimpleRefs & T
+export type DefineRefsAll<T> = SimpleRefsAll & T
 
 export type SimpleInstance<C extends SimpleComponent> = ReturnType<C>
 
@@ -14,8 +14,8 @@ export type SimpleElement<C extends SimpleComponent, T = HTMLElement> = T & {
 
 export interface SimpleComponentPayload<T> {
   el: T
-  ref: SimpleRef
   refs: SimpleRefs
+  refsAll: SimpleRefsAll
 }
 
 export type SimpleComponent<T = HTMLElement> = (

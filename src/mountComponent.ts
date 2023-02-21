@@ -1,9 +1,9 @@
 import { getComponent } from './registerComponent'
-import { SimpleRef, SimpleRefs } from './types'
+import { SimpleRefs, SimpleRefsAll } from './types'
 import { walkComponent } from './walkComponent'
 
-const getRefs = (el: HTMLElement): SimpleRefs => {
-  const refs: SimpleRefs = {}
+const getRefsAll = (el: HTMLElement): SimpleRefsAll => {
+  const refs: SimpleRefsAll = {}
   walkComponent(el, el => {
     const { ref } = el.dataset
     if (ref) {
@@ -26,14 +26,14 @@ const mountChildComponents = (el: HTMLElement) => {
 export const mountComponent = (el: HTMLElement, isChild = false) => {
   // Don't re-initialize component.
   if (!(el as any).$component) {
-    const refs = getRefs(el)
-    const ref: SimpleRef = Object.fromEntries(
-      Object.entries(refs).map(([key, value]) => [key, value[0]])
+    const refsAll = getRefsAll(el)
+    const refs: SimpleRefs = Object.fromEntries(
+      Object.entries(refsAll).map(([key, value]) => [key, value[0]])
     )
 
     const component = getComponent(el)
     if (component) {
-      ;(el as any).$component = component({ el, ref, refs }) || {}
+      ;(el as any).$component = component({ el, refs, refsAll }) || {}
     }
   }
 

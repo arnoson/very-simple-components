@@ -18,17 +18,17 @@ npm i @very-simple/components
 import { registerComponent, defineProps } from '@very-simple/components'
 
 const props = defineProps({ loop: Boolean })
-registerComponent('gallery', ({ el, ref, refs }) => {
+registerComponent('gallery', ({ el, refs, refsAll }) => {
   // Props are read from el's dataset and automatically converted to the correct
   // type. Default values are also possible, see documentation.
   const { loop } = props(el)
 
   // Multiple HTML elements can have the same `ref` name. They will be
-  // grouped in `refs` ...
-  const { slides } = refs
+  // grouped in `refsAll` ...
+  const { slides } = refsAll
 
-  // ... whereas `ref` only stores a single element per name.
-  const { prev, next } = ref
+  // ... whereas `refs` only stores a single element per name.
+  const { prev, next } = refs
 
   let currentIndex = 0
   const maxIndex = slides.length - 1
@@ -80,8 +80,8 @@ registerComponent(name: string, component: Component)
 
 type Component = (payload: {
   el: HTMLElement
-  ref: Record<string, HTMLElement | undefined>
-  refs: Record<string, HTMLElement[]>
+  refs: Record<string, HTMLElement | undefined>
+  refsAll: Record<string, HTMLElement[]>
 }) => any
 ```
 
@@ -187,19 +187,22 @@ const el = document.getElementById<SimpleElement<typeof MyComponent>>('my-id')
 el.$component.sayHello() // <- this gets autocompleted
 ```
 
-### Define Ref(s) Types
+### Define Ref Types
 
 Refs are of type HTMLElement by default, but it can be useful to define a more
 specific type for some of them:
 
 ```ts
-import type { DefineRef, DefineRefs } from '@very-simple/components'
+import type { DefineRefs, DefineRefsAll } from '@very-simple/components'
 
-registerComponent('my-component', ({ refs, ref }) => {
-  const { slides, videos } = refs as DefineRefs<{ videos: HTMLVideoElement[] }>
+registerComponent('my-component', ({ refs, refsAll }) => {
+  const { slides, videos } = refsAll as DefineRefsAll<{
+    videos: HTMLVideoElement[]
+  }>
   // slides -> HTMLElement[]
   // videos -> HTMLVideoElement[]
-  const { container, img } = ref as DefineRef<{ img: HTMLImageElement }>
+
+  const { container, img } = refs as DefineRefs<{ img: HTMLImageElement }>
   // container -> HTMLElement
   // img -> HTMLImageElement
 })
