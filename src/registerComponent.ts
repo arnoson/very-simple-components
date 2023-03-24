@@ -1,4 +1,8 @@
-import { SimpleComponent } from './types'
+import {
+  SimpleComponent,
+  SimpleComponentOptions,
+  SimpleComponentSetup
+} from './types'
 
 export const components: Record<string, SimpleComponent<any>> = {}
 export const getComponent = (el: HTMLElement) => {
@@ -6,16 +10,30 @@ export const getComponent = (el: HTMLElement) => {
   return name ? components[name] : undefined
 }
 
-export const registerComponent = <
-  T extends HTMLElement,
-  C extends SimpleComponent<T>
->(
-  name: string,
-  component: C
-) => {
-  if (typeof component !== 'function') {
+export const defineOptions = (options: SimpleComponentOptions) => options
+
+export function registerComponent<
+  Setup extends SimpleComponentSetup<Options>,
+  Options extends SimpleComponentOptions = {}
+>(name: string, setup: Setup): SimpleComponent<any>
+
+export function registerComponent<
+  Setup extends SimpleComponentSetup<Options>,
+  Options extends SimpleComponentOptions = {}
+>(name: string, options: Options, setup: Setup): SimpleComponent<any>
+
+export function registerComponent<
+  Setup extends SimpleComponentSetup<Options>,
+  Options extends SimpleComponentOptions = {}
+>(name: string, arg1: Options | Setup, arg2?: Setup): SimpleComponent<Options> {
+  const hasBothArgs = arg2 !== undefined
+  const options = (hasBothArgs ? arg1 : {}) as Options
+  const setup = (hasBothArgs ? arg2 : arg1) as Setup
+
+  if (typeof setup !== 'function')
     throw new Error(`Component ${name} is not a function.`)
-  }
+
+  const component = { options, setup }
   components[name] = component
   return component
 }

@@ -15,7 +15,12 @@ it('mounts a component', () => {
   div.dataset.simpleComponent = 'test'
 
   mountComponent(div)
-  expect(component).toBeCalledWith({ el: div, refs: {}, refsAll: {} })
+  expect(component).toBeCalledWith({
+    el: div,
+    refs: {},
+    refsAll: {},
+    props: {}
+  })
 })
 
 it('mounts multiple components', () => {
@@ -99,7 +104,9 @@ it('provides a record of groups of refs with the same name', () => {
     document.querySelector('#ref2'),
     document.querySelector('#ref3')
   ]
-  expect(component).toBeCalledWith(expect.objectContaining({ refsAll: { myRef } }))
+  expect(component).toBeCalledWith(
+    expect.objectContaining({ refsAll: { myRef } })
+  )
 })
 
 it(`parses props`, () => {
@@ -187,7 +194,7 @@ it(`exposes the component's refsAll`, () => {
 
   const myRef = [
     document.getElementById('ref1'),
-    document.getElementById('ref2'),
+    document.getElementById('ref2')
   ]
 
   mountComponents(document.body)

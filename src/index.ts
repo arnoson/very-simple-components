@@ -1,4 +1,3 @@
-export { registerComponent } from './registerComponent'
+export { registerComponent, defineOptions } from './registerComponent'
 export { mountComponent, mountComponents } from './mountComponent'
-export { defineProps } from './props'
 export * from './types'
