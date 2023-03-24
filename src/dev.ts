@@ -1,11 +1,17 @@
 import { registerComponent, mountComponents } from '.'
 
 const options = {
-  props: { message: String, propWithDefault: 123 }
+  props: {
+    number: 42,
+    string: 'default',
+    bool: false,
+    array: () => [],
+    obj: () => ({})
+  }
 }
 
-registerComponent('test', options, ({ props }) => {
-  console.log(props.propWithDefault)
+registerComponent('test', options, ({ el, props }) => {
+  console.log(props.bool, el.dataset.bool)
 })
 
 mountComponents()

@@ -72,4 +72,5 @@ export type SimpleElement<
   $component: SimpleInstance<Component>
   $refs: Payload['refs']
   $refsAll: Payload['refsAll']
+  $props: Payload['props']
 }

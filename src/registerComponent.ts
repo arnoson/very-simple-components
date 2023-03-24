@@ -15,12 +15,12 @@ export const defineOptions = (options: SimpleComponentOptions) => options
 export function registerComponent<
   Setup extends SimpleComponentSetup<Options>,
   Options extends SimpleComponentOptions = {}
->(name: string, setup: Setup): SimpleComponent<any>
+>(name: string, setup: Setup): SimpleComponent<Options>
 
 export function registerComponent<
   Setup extends SimpleComponentSetup<Options>,
   Options extends SimpleComponentOptions = {}
->(name: string, options: Options, setup: Setup): SimpleComponent<any>
+>(name: string, options: Options, setup: Setup): SimpleComponent<Options>
 
 export function registerComponent<
   Setup extends SimpleComponentSetup<Options>,

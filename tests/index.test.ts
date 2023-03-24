@@ -1,25 +1,24 @@
-import { it, expect, vi } from 'vitest'
+import { expect, it, vi } from 'vitest'
 import {
-  registerComponent,
   mountComponent,
   mountComponents,
-  defineProps,
+  registerComponent,
   SimpleElement
 } from '../src'
 
 it('mounts a component', () => {
-  const component = vi.fn()
-  registerComponent('test', component)
+  const setup = vi.fn()
+  registerComponent('test', setup)
 
   const div = document.createElement('div')
   div.dataset.simpleComponent = 'test'
 
   mountComponent(div)
-  expect(component).toBeCalledWith({
+  expect(setup).toBeCalledWith({
     el: div,
     refs: {},
     refsAll: {},
-    props: {}
+    props: div.dataset
   })
 })
 
@@ -112,6 +111,7 @@ it('provides a record of groups of refs with the same name', () => {
 it(`parses props`, () => {
   document.body.innerHTML = `
     <div
+      data-simple-component="test"
       data-number="1"
       data-string="text"
       data-bool="true"
@@ -119,36 +119,57 @@ it(`parses props`, () => {
       data-obj='{ "hello": "world" }'
     ></div>
   `
-  const el = document.querySelector('div')
-  const readProps = defineProps({
-    number: Number,
-    string: String,
-    bool: Boolean,
-    array: Array,
-    obj: Object
-  })
 
-  expect(readProps(el!)).toMatchSnapshot()
+  const options = {
+    props: {
+      number: Number,
+      string: String,
+      bool: Boolean,
+      array: Array,
+      obj: Object
+    }
+  }
+
+  let props: any
+  registerComponent('test', options, ctx => (props = ctx.props))
+  mountComponents()
+
+  expect(props.number).toBe(1)
+  expect(props.string).toBe('text')
+  expect(props.bool).toBe(true)
+  expect(props.array).toEqual([1, 2, 3])
+  expect(props.obj).toEqual({ hello: 'world' })
 })
 
 it(`provides default values for props`, () => {
-  document.body.innerHTML = `<div></div>`
+  document.body.innerHTML = `<div data-simple-component="test"></div>`
   const el = document.querySelector('div')
 
-  const readProps = defineProps({
-    number: 10,
-    string: 'hello',
-    bool: true,
-    array: () => [],
-    obj: () => ({})
-  })
+  const options = {
+    props: {
+      number: 10,
+      string: 'hello',
+      bool: true,
+      array: () => [],
+      obj: () => ({})
+    }
+  }
 
-  expect(readProps(el!)).toMatchSnapshot()
+  let props: any
+  registerComponent('test', options, ctx => (props = ctx.props))
+  mountComponents()
+
+  expect(props.number).toBe(10)
+  expect(props.string).toBe('hello')
+  expect(props.bool).toBe(true)
+  expect(props.array).toEqual([])
+  expect(props.obj).toEqual({})
 })
 
 it('interferes prop types from default values', () => {
   document.body.innerHTML = `
     <div
+      data-simple-component="test"
       data-number="1"
       data-string="text"
       data-bool="true"
@@ -156,16 +177,26 @@ it('interferes prop types from default values', () => {
       data-obj='{ "hello": "world" }'
     ></div>
   `
-  const el = document.querySelector('div')
-  const readProps = defineProps({
-    number: 42,
-    string: 'default',
-    bool: false,
-    array: () => [],
-    obj: () => ({})
-  })
 
-  expect(readProps(el!)).toMatchSnapshot()
+  const options = {
+    props: {
+      number: 42,
+      string: 'default',
+      bool: false,
+      array: () => [],
+      obj: () => ({})
+    }
+  }
+
+  let props: any
+  registerComponent('test', options, ctx => (props = ctx.props))
+  mountComponents()
+
+  expect(props.number).toBe(1)
+  expect(props.string).toBe('text')
+  expect(props.bool).toBe(true)
+  expect(props.array).toEqual([1, 2, 3])
+  expect(props.obj).toEqual({ hello: 'world' })
 })
 
 it(`exposes the component's refs`, () => {
@@ -202,7 +233,24 @@ it(`exposes the component's refsAll`, () => {
   expect(el.$refsAll).toEqual({ myRef })
 })
 
-it(`exposes the component function's return value`, () => {
+it(`exposes the component's props`, () => {
+  document.body.innerHTML = `
+    <div data-simple-component="test" id="my-id"></div>
+  `
+  const options = { props: { prop: 10 } }
+  let props: any
+  const component = registerComponent(
+    'test',
+    options,
+    ctx => (props = ctx.props)
+  )
+  mountComponents()
+
+  const el = document.getElementById('my-id') as SimpleElement<typeof component>
+  expect(el.$props).toBe(props)
+})
+
+it(`exposes the component's setup function's return value`, () => {
   const exposed = { test: () => {} }
   const component = registerComponent('test', () => exposed)
 

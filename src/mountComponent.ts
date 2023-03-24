@@ -19,7 +19,7 @@ const createPropsProxy = (
   const get = (_: Object, key: string) => {
     const value = el.dataset[key]
     const definition = definitions[key]
-    if (!definition) return value
+    if (definition === undefined) return value
 
     const isConstructor = isBuiltInTypeConstructor(definition)
     const providesDefault = !isConstructor
@@ -29,6 +29,7 @@ const createPropsProxy = (
     const type = isConstructor
       ? definition.prototype.constructor.name.toLowerCase()
       : typeof definition
+
     return parseProp(value, type)
   }
 
