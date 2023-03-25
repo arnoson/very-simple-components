@@ -10,7 +10,9 @@ export const getComponent = (el: HTMLElement) => {
   return name ? components[name] : undefined
 }
 
-export const defineOptions = (options: SimpleComponentOptions) => options
+export const defineOptions = <Options extends SimpleComponentOptions>(
+  options: Options
+) => options
 
 export function registerComponent<
   Setup extends SimpleComponentSetup<Options>,
