@@ -25,7 +25,7 @@ type PropTypes<Definitions extends SimpleComponentOptions['props']> = {
 
 export type SimpleRefs = Record<string, HTMLElement>
 
-export type SimpleRefsAll<R extends SimpleRefs> = {
+export type SimpleRefsAll<R extends SimpleRefs = any> = {
   [K in keyof R]: R[K][]
 }
 
@@ -36,7 +36,7 @@ export interface SimpleComponentOptions {
   events?: Record<string, any>
 }
 
-export type SimpleComponentPayload<
+export type SimpleComponentContext<
   Options extends SimpleComponentOptions,
   Refs extends SimpleRefs = HTMLElementsTypes<NonNullable<Options['refs']>>
 > = {
@@ -49,13 +49,15 @@ export type SimpleComponentPayload<
   refs: Record<string, HTMLElement | undefined> & Partial<Refs>
 
   refsAll: Record<string, HTMLElement[]> & SimpleRefsAll<Refs>
+
+  ComponentEvent: SimpleComponentEvent<SimpleEventMap<Options['events']>>
 }
 
 export type SimpleComponentSetup<O extends SimpleComponentOptions> = (
-  payload: SimpleComponentPayload<O>
+  ctx: SimpleComponentContext<O>
 ) => any
 
-export type SimpleComponent<Options extends SimpleComponentOptions> = {
+export type SimpleComponent<Options extends SimpleComponentOptions = any> = {
   setup: SimpleComponentSetup<Options>
   options: Options
 }
@@ -64,13 +66,43 @@ export type SimpleInstance<Component extends SimpleComponent<any>> = ReturnType<
   Component['setup']
 >
 
-export type SimpleElement<
-  Component extends SimpleComponent<any>,
-  Options extends SimpleComponentOptions = Component['options'],
-  Payload extends SimpleComponentPayload<any> = SimpleComponentPayload<Options>
-> = Payload['el'] & {
-  $component: SimpleInstance<Component>
-  $refs: Payload['refs']
-  $refsAll: Payload['refsAll']
-  $props: Payload['props']
+export type SimpleEventMap<Definitions> = {
+  [K in keyof Definitions]: Definitions[K] extends BuiltInTypeConstructor
+    ? CustomEvent<ReturnType<Definitions[K]>>
+    : CustomEvent<Definitions[K]>
 }
+
+export type SimpleComponentEvent<
+  Events extends Record<string, CustomEvent> = any
+> = {
+  new <K extends keyof Events, Detail = Events[K]['detail']>(
+    name: string,
+    ...args: Detail extends undefined | null ? [] : [detail: Detail]
+  ): Events[K]
+}
+
+export type SimpleElement<
+  Component extends SimpleComponent = SimpleComponent,
+  Options extends SimpleComponentOptions = Component['options'],
+  Context extends SimpleComponentContext<any> = SimpleComponentContext<Options>,
+  Events extends SimpleEventMap<Options['events']> = SimpleEventMap<
+    Options['events']
+  >
+> = {
+  addEventListener: <K extends keyof Events>(
+    type: K,
+    listener: (this: SimpleElement<Component>, ev: Events[K]) => any,
+    options?: boolean | AddEventListenerOptions
+  ) => void
+
+  removeEventListener: <K extends keyof Events>(
+    type: K,
+    listener: (this: SimpleElement<Component>, ev: Events[K]) => any,
+    options?: boolean | AddEventListenerOptions
+  ) => void
+
+  $component: SimpleInstance<Component>
+  $refs: Context['refs']
+  $refsAll: Context['refsAll']
+  $props: Context['props']
+} & Context['el']
