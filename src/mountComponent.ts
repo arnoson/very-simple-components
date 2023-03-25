@@ -14,7 +14,7 @@ const mountChildComponents = (el: HTMLElement) => {
 /** Mount a single component */
 export const mountComponent = (el: HTMLElement, isChild = false) => {
   const component = getComponent(el)
-  const isInitialized = !!(el as SimpleElement).$component
+  const isInitialized = !!(el as SimpleElement<any>).$component
 
   if (!isInitialized && component) {
     const simpleEl = el as SimpleElement<typeof component>
