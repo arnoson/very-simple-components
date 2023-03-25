@@ -98,9 +98,7 @@ export type SimpleElement<
   Component extends SimpleComponent,
   Options extends SimpleComponentOptions = Component['options'],
   Context extends SimpleComponentContext<any> = SimpleComponentContext<Options>,
-  Events extends SimpleEventMap<Options['events']> = SimpleEventMap<
-    Options['events']
-  >
+  Events extends SimpleEventMap<any> = SimpleEventMap<Options['events']>
 > = {
   addEventListener: <K extends keyof Events>(
     type: K,
@@ -119,7 +117,3 @@ export type SimpleElement<
   $refsAll: Context['refsAll']
   $props: Context['props']
 } & Context['el']
-
-const el = document.createElement('div')
-
-type T = typeof el
