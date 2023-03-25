@@ -5,12 +5,12 @@ import {
   defineOptions
 } from '.'
 
-const options = defineOptions({
+const counterOptions = defineOptions({
   props: { count: 0 },
   events: { count: Number }
 })
 
-const component = registerComponent('counter', options, ctx => {
+registerComponent('counter', counterOptions, ctx => {
   const { el, props, ComponentEvent } = ctx
   const { count, countDisplay } = ctx.refs
 
@@ -18,19 +18,20 @@ const component = registerComponent('counter', options, ctx => {
 
   count?.addEventListener('click', () => {
     update(++props.count)
-    el.dispatchEvent(new ComponentEvent('count', props.count))
+    el.dispatchEvent(new ComponentEvent('count', { detail: props.count }))
   })
 
   update(props.count)
 })
 
-type ComponentElement = SimpleElement<typeof component>
-const el = document.querySelector<ComponentElement>(
-  '[data-simple-component="counter"]'
-)!
+const todosOptions = {
+  props: { todos: [] as string[] }
+}
 
-el.addEventListener('count', ({ detail: count }) =>
-  console.log(`Count: ${count}`)
-)
+registerComponent('todos', todosOptions, ({ props }) => {
+  console.log(props.todos)
+
+  props.todos = [...props.todos, 'three']
+})
 
 mountComponents()
