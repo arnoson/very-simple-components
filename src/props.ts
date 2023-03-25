@@ -21,8 +21,8 @@ export const createPropsProxy = (
 
     const isConstructor = isBuiltInTypeConstructor(definition)
     const providesDefault = !isConstructor
-    if (value === undefined && providesDefault)
-      return getDefaultProp(definition)
+    if (value === undefined)
+      return providesDefault ? getDefaultProp(definition) : undefined
 
     const type = isConstructor
       ? definition.prototype.constructor.name.toLowerCase()
