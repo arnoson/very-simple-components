@@ -7,14 +7,10 @@
     <title>Document</title>
   </head>
   <body>
-    <div
-      data-simple-component="test"
-      data-number="1"
-      data-string="text"
-      data-bool="true"
-      data-array="[1,2,3]"
-      data-obj='{ "hello": "world" }'
-    ></div>
+    <div data-simple-component="counter">
+      <span data-ref="countDisplay">0</span>
+      <button data-ref="count">+</button>
+    </div>
     <script type="module" src="./src/dev.ts"></script>
   </body>
 </html>
