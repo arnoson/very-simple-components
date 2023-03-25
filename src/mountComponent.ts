@@ -1,56 +1,16 @@
+import { createPropsProxy } from './props'
+import { getRefs } from './refs'
 import { getComponent } from './registerComponent'
-import { SimpleElement, SimpleRefs, SimpleRefsAll } from './types'
-import { isBuiltInTypeConstructor } from './utils'
-import { walkComponent } from './walkComponent'
+import { SimpleComponentEvent, SimpleElement } from './types'
 
-const parseProp = (value: any, type: string) =>
-  type === 'string' ? String(value) : JSON.parse(value)
-
-const stringifyProp = (value: any) =>
-  typeof value === 'string' ? value : JSON.stringify(value)
-
-const getDefaultProp = (definition: any) =>
-  definition instanceof Function ? definition() : definition
-
-const createPropsProxy = (
-  el: HTMLElement,
-  definitions: Record<string, any>
-) => {
-  const get = (_: Object, key: string) => {
-    const value = el.dataset[key]
-    const definition = definitions[key]
-    if (definition === undefined) return value
-
-    const isConstructor = isBuiltInTypeConstructor(definition)
-    const providesDefault = !isConstructor
-    if (value === undefined && providesDefault)
-      return getDefaultProp(definition)
-
-    const type = isConstructor
-      ? definition.prototype.constructor.name.toLowerCase()
-      : typeof definition
-
-    return parseProp(value, type)
+/**
+ * Just a little syntactic sugar for `CustomEvent`. Passed to the component's
+ * context as the fully typed `ComponentEvent`.
+ * */
+export class CustomEventFactory {
+  constructor(name: string, detail?: any) {
+    return new CustomEvent(name, { detail })
   }
-
-  const set = (_: Object, key: string, value: unknown) => {
-    el.dataset[key] = stringifyProp(value)
-    return true
-  }
-
-  return new Proxy({}, { get, set })
-}
-
-const getRefsAll = (el: HTMLElement): SimpleRefsAll<any> => {
-  const refs: SimpleRefsAll<any> = {}
-  walkComponent(el, el => {
-    const { ref } = el.dataset
-    if (ref) {
-      refs[ref] ??= []
-      refs[ref].push(el)
-    }
-  })
-  return refs
 }
 
 const mountChildComponents = (el: HTMLElement) => {
@@ -63,27 +23,25 @@ const mountChildComponents = (el: HTMLElement) => {
 
 /** Mount a single component */
 export const mountComponent = (el: HTMLElement, isChild = false) => {
-  // Don't re-initialize component.
-  if (!(el as any).$component) {
-    const refsAll = getRefsAll(el)
-    const refs: SimpleRefs = Object.fromEntries(
-      Object.entries(refsAll).map(([key, value]) => [key, value[0]])
-    )
+  const component = getComponent(el)
+  const isInitialized = !!(el as SimpleElement).$component
 
-    const component = getComponent(el)
-    if (component) {
-      const simpleEl = el as SimpleElement<typeof component>
-      const propsDefinitions = component.options.props
+  if (!isInitialized && component) {
+    const simpleEl = el as SimpleElement<typeof component>
 
-      const props = propsDefinitions
-        ? createPropsProxy(el, propsDefinitions)
-        : el.dataset
+    const propsDefinitions = component.options.props
+    const props = propsDefinitions
+      ? createPropsProxy(el, propsDefinitions)
+      : el.dataset
 
-      simpleEl.$props = props
-      simpleEl.$refs = refs
-      simpleEl.$refsAll = refsAll
-      simpleEl.$component = component.setup({ el, refs, refsAll, props }) || {}
-    }
+    const { refs, refsAll } = getRefs(el)
+    const ComponentEvent = CustomEventFactory as SimpleComponentEvent
+    const ctx = { el, props, refs, refsAll, ComponentEvent }
+
+    simpleEl.$props = props
+    simpleEl.$refs = refs
+    simpleEl.$refsAll = refsAll
+    simpleEl.$component = component.setup(ctx) || {}
   }
 
   if (!isChild) mountChildComponents(el)
