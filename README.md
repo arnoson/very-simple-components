@@ -1,8 +1,8 @@
 # ♻️ Very Simple Components
 
-A very simple way to attach javascript to the DOM. When even [petite-vue](https://github.com/vuejs/petite-vue) or [alpine.js](https://github.com/alpinejs/alpine/) would be too much.
+A very simple way to attach javascript/typescript to the DOM. When even [petite-vue](https://github.com/vuejs/petite-vue) or [alpine.js](https://github.com/alpinejs/alpine/) would be too much.
 
-💾 ~ 0.6kb (minify and gzip)
+💾 ~ 0.8kb (minify and gzip)
 
 ## Installation
 
@@ -15,13 +15,16 @@ npm i @very-simple/components
 ```js
 // components/gallery.js
 
-import { registerComponent, defineProps } from '@very-simple/components'
+import { registerComponent, defineOptions } from '@very-simple/components'
 
-const props = defineProps({ loop: Boolean })
-registerComponent('gallery', ({ el, refs, refsAll }) => {
+const options = defineOptions({
+  props: { loop: Boolean }
+})
+
+registerComponent('gallery', options, ({ el, props, refs, refsAll }) => {
   // Props are read from el's dataset and automatically converted to the correct
   // type. Default values are also possible, see documentation.
-  const { loop } = props(el)
+  const { loop } = props
 
   // Multiple HTML elements can have the same `ref` name. They will be
   // grouped in `refsAll` ...
@@ -76,13 +79,58 @@ registerComponent('gallery', ({ el, refs, refsAll }) => {
 ### Register a Component
 
 ```ts
-registerComponent(name: string, component: Component)
+registerComponent('my-name', (ctx: Context) => {})
 
-type Component = (payload: {
+type Context = {
+  // The element the component is mounted to.
   el: HTMLElement
+
+  // The props of the component. If no prop types or default values are defined
+  // this is just the element's dataset. Otherwise it will be a proxy around the
+  // element's dataset that takes care of converting the props to the correct type.
+  // See: #Props
+  props: DOMStringMap | Proxy
+
+  // A Record of refs (elements with a `data-ref="name"` inside the component).
   refs: Record<string, HTMLElement | undefined>
+
+  // Similar to refs but can also contain multiple refs with the same name.
   refsAll: Record<string, HTMLElement[]>
-}) => any
+
+  // A fully typed `CustomEvent` constructor to dispatch type safe events.
+  // See: #Events
+  ComponentEvent: SimpleComponentEvent
+}
+```
+
+### Register a Component with Options
+
+By passing along `options`, you can add provide additional type hints and automatically parse props from the element's dataset to the correct type.
+
+```ts
+const options = defineOptions({
+  // Provide a type for the element (default will be HTMLElement)
+  el: HTMLImageElement,
+
+  // Provide types and/or default values for props
+  // See: #Props
+  props: {
+    loop: Boolean,
+    count: 10
+  },
+
+  // Provide types for some or all refs (by default all refs will be HTMLElement)
+  refs: { click: HTMLButtonElement },
+
+  // Provide types for the elements events.
+  // See: #Events
+  events: {
+    updateCount: Number,
+    close: null
+  }
+})
+
+registerComponent('my-name', options, (ctx: Context) => {})
 ```
 
 ### Mount a single Component
@@ -100,42 +148,39 @@ mountComponent(el: HTMLElement)
 mountComponent(root?: HTMLElement)
 ```
 
-### Define Props
+### Props
 
-Define properties to automatically convert `el.dataset` properties to the
-correct type and enable autocompletion.
-
-```ts
-// You can either define a prop's type by proving a constructor ...
-defineProps({ answer: Number, enabled: Boolean })
-
-// ... or by providing a default value.
-defineProps({ answer: 42, enabled: true })
-
-// For objects and arrays the default value can be wrapped inside a function
-defineProps({ list: () => [1, 2, 3] })
-```
-
-Example:
+`props`, passed to the component's setup function can read from / write to the component elements dataset. By default all values are strings (as is the normal behavior with an element's dataset). But by providing types and default values for props, these values will be automatically converted to the correct type!
 
 ```ts
-const props = defineProps({
-  enabled: true,
-  message: String,
-  tags: () => ['default']
+const options = defineOptions({
+  props: { count: 0 }
 })
 
-registerComponent('my-component', ({ el }) => {
-  const { enabled, message, tags } = props(el)
+registerComponent('my-component', options, ({ el, props }) => {
+  // If the element hasn't `data-count` specified, this will output the default
+  // value `0`.
+  console.log(props.count) // => 0
+
+  // If the element has `data-count="20"`, "20" will be automatically parsed
+  // into a number and returned.
+  console.log(props.count) // => 20
 })
 ```
 
-```html
-<div
-  data-simple-component="my-component"
-  data-message="Hello"
-  data-tags='[ "very", "simple", "components" ]'
-></div>
+This also works for complex data types:
+
+```ts
+const options = defineOptions({
+  props: { todos: [] as string[] }
+})
+
+// Lets say the html for the component looks like this:
+// <div data-simple-component="todo" data-todos='["mount components!", "enjoy"]'>
+
+registerComponent('todo', options, ({ props }) => {
+  console.log(props.todos[0]) // => 'mount components!'
+})
 ```
 
 ### Ignore Elements
@@ -149,32 +194,37 @@ to mount:
 </div>
 ```
 
-### Expose Component Methods
+### Expose Component
 
-Everything you return from the component function is available on the HTML
-element's `$component` property:
+The component's context and everything you return from the component's setup function is available on the HTML element.
 
 ```js
-registerComponent('my-component', () => {
-  const sayHello = () => console.log('Hello :~)')
+registerComponent('my-component', ({ refs, refsAll, props }) => {
+  const sayHello = () => console.log(props.message)
   return { sayHello }
 })
 ```
 
 ```html
-<div data-simple-component="my-component" id="my-id"></div>
+<div data-simple-component="my-component" id="my-id" data-message="Hello :~)">
+  <button data-ref="button">Click me!</button>
+</div>
 ```
 
 ```js
-document.getElementById('my-id').$component.sayHello()
+const el = document.getElementById('my-id')
+el.$refs.button.innerText // => 'Click me!'
+el.$component.sayHello() // => 'Hello :~)'
+el.$props.message = 'Goodbye'
+el.$component.sayHello() // => 'Goodbye'
 ```
 
 With typescript you can also get autocompletion:
 
 ```ts
 // my-component.ts
-export default registerComponent('my-component', () => {
-  const sayHello = () => console.log('Hello :~)')
+export default registerComponent('my-component', ({ props }) => {
+  const sayHello = () => console.log(props.message)
   return { sayHello }
 })
 
@@ -182,7 +232,8 @@ export default registerComponent('my-component', () => {
 import MyComponent from './my-component.ts'
 import type { SimpleElement } from '@very-simple/components'
 
-const el = document.getElementById<SimpleElement<typeof MyComponent>>('my-id')
+type MyComponentElement = SimpleElement<typeof MyComponent>
+const el = document.getElementById<MyComponentElement>('my-id')
 
 el.$component.sayHello() // <- this gets autocompleted
 ```
@@ -193,17 +244,55 @@ Refs are of type HTMLElement by default, but it can be useful to define a more
 specific type for some of them:
 
 ```ts
-import type { DefineRefs, DefineRefsAll } from '@very-simple/components'
+const options = defineOptions({
+  refs: { img: HTMLImageElement, videos: HTMLVideoElement }
+})
 
-registerComponent('my-component', ({ refs, refsAll }) => {
-  const { slides, videos } = refsAll as DefineRefsAll<{
-    videos: HTMLVideoElement[]
-  }>
-  // slides -> HTMLElement[]
-  // videos -> HTMLVideoElement[]
-
-  const { container, img } = refs as DefineRefs<{ img: HTMLImageElement }>
+registerComponent('my-component', options, ({ refs, refsAll }) => {
+  const { container, img } = refs
   // container -> HTMLElement
   // img -> HTMLImageElement
+
+  const { slides, videos } = refsAll
+  // slides -> HTMLElement[]
+  // videos -> HTMLVideoElement[]
 })
+```
+
+### Events
+
+Components try to stay as close to native APIs as possible. Therefore events are just [CustomEvent](https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent), but they can be fully typed:
+
+```ts
+const options = defineOptions({
+  events: { updateCounter: Number, close: null }
+})
+
+registerComponent('my-component', options, ({ el, ComponentEvent }) => {
+  // These will be autocompleted and generate type-errors if you forget, for
+  // example, the value for the `updateCounter` event.
+  el.dispatchEvent(new ComponentEvent('updateCounter', { detail: 10 }))
+  el.dispatchEvent(new ComponentEvent('close'))
+
+  // `ComponentEvent` ist just the native `CustomEvent` but with types based
+  // on your `options.events`.
+})
+```
+
+This also works if you listen to a component's event from outside the component's setup fuction.
+
+```ts
+// my-component.ts
+const options = defineOptions({ events: { updateCounter: Number } })
+export default registerComponent('my-component', options, () => {})
+
+// index.ts
+import MyComponent from './my-component.ts'
+import type { SimpleElement } from '@very-simple/components'
+
+type MyComponentElement = SimpleElement<typeof MyComponent>
+const el = document.getElementById<MyComponentElement>('my-id')
+
+// This will be fully typed:
+el.addEventListener('updateCounter', ({ detail: count }) => console.log(count))
 ```
