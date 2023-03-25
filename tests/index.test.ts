@@ -5,6 +5,7 @@ import {
   registerComponent,
   SimpleElement
 } from '../src'
+import { CustomEventFactory } from '../src/mountComponent'
 
 it('mounts a component', () => {
   const setup = vi.fn()
@@ -18,7 +19,8 @@ it('mounts a component', () => {
     el: div,
     refs: {},
     refsAll: {},
-    props: div.dataset
+    props: div.dataset,
+    ComponentEvent: CustomEventFactory
   })
 })
 
