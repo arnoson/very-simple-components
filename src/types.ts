@@ -6,10 +6,6 @@ type HTMLElementConstructor = typeof HTMLElement
 
 type HTMLElementType<T extends HTMLElementConstructor> = T['prototype']
 
-type HTMLElementsTypes<T extends Record<string, HTMLElementConstructor>> = {
-  [K in keyof T]: HTMLElementType<T[K]>
-}
-
 type BuiltInType = Number | String | Array<any> | Object | Boolean
 
 type BuiltInTypeConstructor =
@@ -27,7 +23,7 @@ type PropTypes<Definitions extends SimpleComponentOptions['props']> = {
     : Definitions[K]
 }
 
-export type SimpleRefs = Record<string, HTMLElement>
+export type SimpleRefs = Record<string, HTMLElement | SimpleElement<any>>
 
 export type SimpleRefsAll<R extends SimpleRefs = any> = {
   [K in keyof R]: R[K][]
@@ -36,13 +32,21 @@ export type SimpleRefsAll<R extends SimpleRefs = any> = {
 export interface SimpleComponentOptions {
   el?: HTMLElementConstructor
   props?: Record<string, BuiltInType | BuiltInTypeConstructor>
-  refs?: Record<string, HTMLElementConstructor>
+  refs?: Record<string, HTMLElementConstructor | SimpleComponent>
   events?: Record<string, any>
+}
+
+type ResolveRefs<Refs extends SimpleComponentOptions['refs']> = {
+  [K in keyof Refs]: Refs[K] extends HTMLElementConstructor
+    ? HTMLElementType<Refs[K]>
+    : Refs[K] extends SimpleComponent
+    ? SimpleElement<Refs[K]>
+    : never
 }
 
 export type SimpleComponentContext<
   Options extends SimpleComponentOptions,
-  Refs extends SimpleRefs = HTMLElementsTypes<NonNullable<Options['refs']>>
+  Refs extends SimpleRefs = ResolveRefs<NonNullable<Options['refs']>>
 > = {
   el: Options['el'] extends HTMLElementConstructor
     ? HTMLElementType<Options['el']>
@@ -115,3 +119,7 @@ export type SimpleElement<
   $refsAll: Context['refsAll']
   $props: Context['props']
 } & Context['el']
+
+const el = document.createElement('div')
+
+type T = typeof el
