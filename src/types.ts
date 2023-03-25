@@ -57,12 +57,15 @@ export type SimpleComponentContext<
   ComponentEvent: SimpleComponentEvent<SimpleEventMap<Options['events']>>
 }
 
-export type SimpleComponentSetup<O extends SimpleComponentOptions> = (
-  ctx: SimpleComponentContext<O>
+export type SimpleComponentSetup<Options extends SimpleComponentOptions> = (
+  ctx: SimpleComponentContext<Options>
 ) => any
 
-export type SimpleComponent<Options extends SimpleComponentOptions = any> = {
-  setup: SimpleComponentSetup<Options>
+export type SimpleComponent<
+  Options extends SimpleComponentOptions = any,
+  Setup extends SimpleComponentSetup<Options> = any
+> = {
+  setup: Setup
   options: Options
 }
 
@@ -88,7 +91,7 @@ export interface SimpleComponentEvent<
 }
 
 export type SimpleElement<
-  Component extends SimpleComponent = SimpleComponent,
+  Component extends SimpleComponent,
   Options extends SimpleComponentOptions = Component['options'],
   Context extends SimpleComponentContext<any> = SimpleComponentContext<Options>,
   Events extends SimpleEventMap<Options['events']> = SimpleEventMap<

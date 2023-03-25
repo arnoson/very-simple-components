@@ -17,17 +17,21 @@ export const defineOptions = <Options extends SimpleComponentOptions>(
 export function registerComponent<
   Setup extends SimpleComponentSetup<Options>,
   Options extends SimpleComponentOptions = {}
->(name: string, setup: Setup): SimpleComponent<Options>
+>(name: string, setup: Setup): SimpleComponent<Options, Setup>
 
 export function registerComponent<
   Setup extends SimpleComponentSetup<Options>,
   Options extends SimpleComponentOptions = {}
->(name: string, options: Options, setup: Setup): SimpleComponent<Options>
+>(name: string, options: Options, setup: Setup): SimpleComponent<Options, Setup>
 
 export function registerComponent<
   Setup extends SimpleComponentSetup<Options>,
   Options extends SimpleComponentOptions = {}
->(name: string, arg1: Options | Setup, arg2?: Setup): SimpleComponent<Options> {
+>(
+  name: string,
+  arg1: Options | Setup,
+  arg2?: Setup
+): SimpleComponent<Options, Setup> {
   const hasBothArgs = arg2 !== undefined
   const options = (hasBothArgs ? arg1 : {}) as Options
   const setup = (hasBothArgs ? arg2 : arg1) as Setup
