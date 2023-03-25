@@ -1,3 +1,7 @@
+interface CustomEventInitRequired<T = any> extends CustomEventInit {
+  detail: T
+}
+
 type HTMLElementConstructor = typeof HTMLElement
 
 type HTMLElementType<T extends HTMLElementConstructor> = T['prototype']
@@ -72,12 +76,14 @@ export type SimpleEventMap<Definitions> = {
     : CustomEvent<Definitions[K]>
 }
 
-export type SimpleComponentEvent<
+export interface SimpleComponentEvent<
   Events extends Record<string, CustomEvent> = any
-> = {
-  new <K extends keyof Events, Detail = Events[K]['detail']>(
+> extends CustomEvent {
+  new <K extends keyof Events>(
     name: string,
-    ...args: Detail extends undefined | null ? [] : [detail: Detail]
+    ...args: Events[K]['detail'] extends undefined | null
+      ? [eventInitDict?: CustomEventInit]
+      : [eventInitDict: CustomEventInitRequired<Events[K]['detail']>]
   ): Events[K]
 }
 
