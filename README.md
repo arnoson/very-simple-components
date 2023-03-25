@@ -92,6 +92,7 @@ type Context = {
   props: DOMStringMap | Proxy
 
   // A Record of refs (elements with a `data-ref="name"` inside the component).
+  // See: #Refs
   refs: Record<string, HTMLElement | undefined>
 
   // Similar to refs but can also contain multiple refs with the same name.
@@ -120,6 +121,7 @@ const options = defineOptions({
   },
 
   // Provide types for some or all refs (by default all refs will be HTMLElement)
+  // See: #Refs
   refs: { click: HTMLButtonElement },
 
   // Provide types for the elements events.
@@ -146,6 +148,17 @@ mountComponent(el: HTMLElement)
 ```ts
 // If no `root` is provided, `<body>` is used.
 mountComponent(root?: HTMLElement)
+```
+
+### Ignore Elements
+
+Sometimes it is useful to skip big DOM elements when searching for components
+to mount:
+
+```html
+<div data-simple-ignore>
+  <!-- a lot of DOM elements ... -->
+</div>
 ```
 
 ### Props
@@ -181,17 +194,6 @@ const options = defineOptions({
 registerComponent('todo', options, ({ props }) => {
   console.log(props.todos[0]) // => 'mount components!'
 })
-```
-
-### Ignore Elements
-
-Sometimes it is useful to skip big DOM elements when searching for components
-to mount:
-
-```html
-<div data-simple-ignore>
-  <!-- a lot of DOM elements ... -->
-</div>
 ```
 
 ### Expose Component
@@ -238,7 +240,7 @@ const el = document.getElementById<MyComponentElement>('my-id')
 el.$component.sayHello() // <- this gets autocompleted
 ```
 
-### Define Ref Types
+### Refs
 
 Refs are of type HTMLElement by default, but it can be useful to define a more
 specific type for some of them:
@@ -257,6 +259,29 @@ registerComponent('my-component', options, ({ refs, refsAll }) => {
   // slides -> HTMLElement[]
   // videos -> HTMLVideoElement[]
 })
+```
+
+You can also use another simple component as a ref type. This is very useful inside a parent component.
+
+```ts
+// child.ts
+export default registerComponent('child', () => {})
+
+// parent.ts
+import Child from './child.ts'
+
+const options = defineOptions({
+  refs: { theChild: Child }
+})
+registerComponent('parent', options, ({ refs }) => {
+  // ...
+})
+```
+
+```html
+<div data-simple-component="parent">
+  <div data-simple-component="child" data-ref="theChild"></div>
+</div>
 ```
 
 ### Events
