@@ -106,7 +106,7 @@ type Context = {
 
 ### Register a Component with Options
 
-By passing along `options`, you can add provide additional type hints and automatically parse props from the element's dataset to the correct type.
+By passing along `options`, you can provide additional type hints and automatically parse props from the element's dataset to the correct type.
 
 ```ts
 const options = defineOptions({
