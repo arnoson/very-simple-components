@@ -1,6 +1,6 @@
 {
   "name": "@very-simple/components",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "A very simple way to attach javascript to the DOM",
   "type": "module",
   "main": "dist/index.js",
