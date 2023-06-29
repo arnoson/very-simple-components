@@ -32,13 +32,13 @@
   "author": "arnoson",
   "license": "MIT",
   "devDependencies": {
-    "bumpp": "^8.2.1",
-    "jsdom": "^20.0.0",
-    "prettier": "^2.8.7",
+    "bumpp": "^9.1.1",
+    "jsdom": "^22.1.0",
+    "prettier": "^2.8.8",
     "shx": "^0.3.4",
-    "tsup": "^6.0.1",
-    "typescript": "^4.8.4",
-    "vite": "^3.0.0",
-    "vitest": "^0.24.0"
+    "tsup": "^7.1.0",
+    "typescript": "^5.1.6",
+    "vite": "^4.3.9",
+    "vitest": "^0.32.2"
   }
 }
