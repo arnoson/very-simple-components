@@ -2,7 +2,7 @@
 
 A very simple way to attach javascript/typescript to the DOM. When even [petite-vue](https://github.com/vuejs/petite-vue) or [alpine.js](https://github.com/alpinejs/alpine/) would be too much.
 
-💾 ~ 0.8kb (minify and gzip)
+💾 ~ 0.9kb (minify and gzip)
 
 ## Installation
 
