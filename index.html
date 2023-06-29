@@ -7,9 +7,13 @@
     <title>Document</title>
   </head>
   <body>
-    <div data-simple-component="counter">
+    <div data-simple-component="counter" id="counter">
       <span data-ref="countDisplay">0</span>
-      <button data-ref="count">+</button>
+      <div data-simple-component="fu">
+        <div data-simple-component="bar">
+          <button data-ref="counter/count">+</button>
+        </div>
+      </div>
     </div>
 
     <div data-simple-component="todos" data-todos='["one", "two"]'></div>

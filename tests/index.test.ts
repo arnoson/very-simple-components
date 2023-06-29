@@ -73,18 +73,22 @@ it('provides a record of single refs', () => {
   registerComponent('test', component)
 
   document.body.innerHTML = `
-    <div data-simple-component="test">
-      <div data-ref="myRef"></div>
+    <div data-simple-component="test" id="my-test">
+      <div id="ref1" data-ref="myRef"></div>
       <div data-simple-component="another-component">
-        <!-- This shouldn't show up in the refs because it belongs to another 
-        component -->
-        <div data-ref="nestedRef"></div>
+        <div data-ref="otherComponentsRef"></div>
+        <div id="ref2" data-ref="test/deepRef"></div>
+        <div id="ref3" data-ref="(#my-test)/selectorDeepRef"></div>
       </div>
     </div>
   `
   mountComponents(document.body)
-  const myRef = document.querySelector(`[data-ref='myRef']`)
-  expect(component).toBeCalledWith(expect.objectContaining({ refs: { myRef } }))
+  const myRef = document.querySelector('#ref1')
+  const deepRef = document.querySelector('#ref2')
+  const selectorDeepRef = document.querySelector('#ref3')
+  expect(component).toBeCalledWith(
+    expect.objectContaining({ refs: { myRef, deepRef, selectorDeepRef } })
+  )
 })
 
 it('provides a record of groups of refs with the same name', () => {
@@ -96,13 +100,17 @@ it('provides a record of groups of refs with the same name', () => {
       <div id="ref1" data-ref="myRef"></div>
       <div id="ref2" data-ref="myRef"></div>
       <div id="ref3" data-ref="myRef"></div>
+      <div data-simple-component="another-component">
+        <div id="ref4" data-ref="test/myRef"></div>
+      </div>
     </div>
   `
   mountComponents(document.body)
   const myRef = [
     document.querySelector('#ref1'),
     document.querySelector('#ref2'),
-    document.querySelector('#ref3')
+    document.querySelector('#ref3'),
+    document.querySelector('#ref4')
   ]
   expect(component).toBeCalledWith(
     expect.objectContaining({ refsAll: { myRef } })

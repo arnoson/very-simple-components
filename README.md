@@ -284,6 +284,21 @@ registerComponent('parent', options, ({ refs }) => {
 </div>
 ```
 
+### Deep/Nested Refs
+
+Sometimes you may want to associate a ref that is nested inside another component with the parent component instead. You can do so by providing a path with the parent components name: `parent/ref`.
+
+```html
+<div data-simple-component="parent">
+  <div data-simple-component="child">
+    <button data-ref="parent/button">I'm a ref of `parent`</button>
+    <button data-ref="button">I'm a ref of `child`</button>
+  </div>
+</div>
+```
+
+Referencing the parent component by it's name as above is the most common scenario, but in some rare cases you may want to target a specific html element. You can do this by using a CSS selector surrounded by parentheses: `(#my-component)/ref` or `(div.some-class)/ref`.
+
 ### Events
 
 Components try to stay as close to native APIs as possible. Therefore events are just [CustomEvent](https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent), but they can be fully typed:
