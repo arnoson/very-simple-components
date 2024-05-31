@@ -1,6 +1,6 @@
 # ♻️ Very Simple Components
 
-A very simple way to attach javascript/typescript to the DOM. When even [petite-vue](https://github.com/vuejs/petite-vue) or [alpine.js](https://github.com/alpinejs/alpine/) would be too much.
+A very simple way to attach javascript/typescript to the DOM. When even [Petite-Vue](https://github.com/vuejs/petite-vue) or [Alpinejs](https://github.com/alpinejs/alpine/) would be too much.
 
 💾 ~ 0.9kb (minify and gzip)
 
@@ -22,7 +22,7 @@ const options = defineOptions({
 })
 
 registerComponent('gallery', options, ({ el, props, refs, refsAll }) => {
-  // Props are read from el's dataset and automatically converted to the correct
+  // Props are read from el's dataset and are automatically converted to the correct
   // type. Default values are also possible, see documentation.
   const { loop } = props
 
