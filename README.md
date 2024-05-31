@@ -1,6 +1,6 @@
 # ♻️ Very Simple Components
 
-A very simple way to attach javascript/typescript to the DOM. When even [Petite-Vue](https://github.com/vuejs/petite-vue) or [Alpinejs](https://github.com/alpinejs/alpine/) would be too much.
+A very simple way to attach JavaScript/TypeScript to the DOM. When even [Petite-Vue](https://github.com/vuejs/petite-vue) or [Alpinejs](https://github.com/alpinejs/alpine/) would be too much.
 
 💾 ~ 0.9kb (minify and gzip)
 
