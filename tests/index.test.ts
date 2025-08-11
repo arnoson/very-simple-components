@@ -175,6 +175,26 @@ it(`provides default values for props`, () => {
   expect(props.obj).toEqual({})
 })
 
+it(`adds default values to the dataset`, () => {
+  document.body.innerHTML = `<div data-simple-component="test" data-provided="provided"></div>`
+  const el = document.querySelector('div')
+
+  const options = {
+    props: {
+      missing: 10,
+      provided: 'default',
+      ignore: Number
+    }
+  }
+
+  registerComponent('test', options, () => {})
+  mountComponents()
+
+  expect(el?.dataset.missing).toBe('10')
+  expect(el?.dataset.provided).toBe('provided')
+  expect(el?.dataset.ignore).toBe(undefined)
+})
+
 it('interferes prop types from default values', () => {
   document.body.innerHTML = `
     <div

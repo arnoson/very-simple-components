@@ -1,13 +1,13 @@
-const isBuiltInTypeConstructor = (value: any) =>
+export const isBuiltInTypeConstructor = (value: any) =>
   [Number, String, Boolean, Array, Object].includes(value)
 
-const parseProp = (value: any, type: string) =>
+export const parseProp = (value: any, type: string) =>
   type === 'string' ? String(value) : JSON.parse(value)
 
-const stringifyProp = (value: any) =>
+export const stringifyProp = (value: any) =>
   typeof value === 'string' ? value : JSON.stringify(value)
 
-const getDefaultProp = (definition: any) =>
+export const getDefaultProp = (definition: any) =>
   definition instanceof Function ? definition() : definition
 
 export const createPropsProxy = (

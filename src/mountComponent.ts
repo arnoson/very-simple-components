@@ -1,4 +1,9 @@
-import { createPropsProxy } from './props'
+import {
+  createPropsProxy,
+  getDefaultProp,
+  isBuiltInTypeConstructor,
+  stringifyProp
+} from './props'
 import { getRefs } from './refs'
 import { getComponent } from './registerComponent'
 import { SimpleComponentEvent, SimpleElement } from './types'
@@ -23,6 +28,19 @@ export const mountComponent = (el: HTMLElement, isChild = false) => {
     const props = propsDefinitions
       ? createPropsProxy(el, propsDefinitions)
       : el.dataset
+
+    // Add missing default prop values to dataset for CSS/query selectors.
+    if (propsDefinitions) {
+      for (const [key, definition] of Object.entries(propsDefinitions)) {
+        if (el.dataset[key] !== undefined) continue
+
+        const providesDefault = !isBuiltInTypeConstructor(definition)
+        if (!providesDefault) continue
+
+        const value = getDefaultProp(definition)
+        el.dataset[key] = stringifyProp(value)
+      }
+    }
 
     const { refs, refsAll } = getRefs(el)
     const ComponentEvent = CustomEvent as SimpleComponentEvent
