@@ -10,9 +10,16 @@ export const getRefs = (el: HTMLElement) => {
 
   walkComponent(el, el => {
     const { ref } = el.dataset
-    if (ref) addRef(ref, el)
+    if (!ref) return
+
+    const isDeepRef = ref.includes('/')
+    if (isDeepRef) return
+
+    addRef(ref, el)
   })
 
+  // Deep refs can't be handled during DOM walk, since we stop at child
+  // components.
   const deepRefs = el.querySelectorAll<HTMLElement>('[data-ref*="/"]')
   deepRefs.forEach(refEl => {
     const [parent, name] = refEl.dataset.ref!.split('/')
@@ -20,7 +27,7 @@ export const getRefs = (el: HTMLElement) => {
     const selector = parent.match(/^\((.*)\)$/)?.[1]
     const parentSelector = selector ?? `[data-simple-component='${parent}']`
 
-    const parentEl = el.closest(parentSelector)
+    const parentEl = refEl.closest(parentSelector)
     if (parentEl === el) addRef(name, refEl)
   })
 
