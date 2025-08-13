@@ -19,8 +19,8 @@ type PropTypes<Definitions extends SimpleComponentOptions['props']> = {
   [K in keyof Definitions]: Definitions[K] extends BuiltInTypeConstructor
     ? ReturnType<Definitions[K]> | undefined
     : Definitions[K] extends () => any
-    ? ReturnType<Definitions[K]>
-    : Definitions[K]
+      ? ReturnType<Definitions[K]>
+      : Definitions[K]
 }
 
 export type SimpleRefs = Record<string, HTMLElement | SimpleElement<any>>
@@ -40,8 +40,8 @@ type ResolveRefs<Refs extends SimpleComponentOptions['refs']> = {
   [K in keyof Refs]: Refs[K] extends HTMLElementConstructor
     ? HTMLElementType<Refs[K]>
     : Refs[K] extends SimpleComponent
-    ? SimpleElement<Refs[K]>
-    : never
+      ? SimpleElement<Refs[K]>
+      : never
 }
 
 export type SimpleComponentContext<
@@ -116,4 +116,5 @@ export type SimpleElement<
   $refs: Context['refs']
   $refsAll: Context['refsAll']
   $props: Context['props']
+  $options: Options
 } & Context['el']

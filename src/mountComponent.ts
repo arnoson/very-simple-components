@@ -49,6 +49,7 @@ export const mountComponent = (el: HTMLElement, isChild = false) => {
     simpleEl.$props = props
     simpleEl.$refs = refs
     simpleEl.$refsAll = refsAll
+    simpleEl.$options = component.options
     simpleEl.$component = component.setup(ctx) || {}
   }
 
