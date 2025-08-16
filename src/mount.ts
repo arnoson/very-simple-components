@@ -1,3 +1,4 @@
+import { getComponent } from './component'
 import {
   createPropsProxy,
   getDefaultProp,
@@ -5,7 +6,6 @@ import {
   stringifyProp
 } from './props'
 import { getRefs } from './refs'
-import { getComponent } from './registerComponent'
 import { SimpleComponentEvent, SimpleElement } from './types'
 
 const mountChildComponents = (el: HTMLElement) => {
@@ -24,7 +24,7 @@ export const mountComponent = (el: HTMLElement, isChild = false) => {
   if (!isInitialized && component) {
     const simpleEl = el as SimpleElement<typeof component>
 
-    const propsDefinitions = component.options.props
+    const propsDefinitions = component.definition.props
     const props = propsDefinitions
       ? createPropsProxy(el, propsDefinitions)
       : el.dataset
@@ -49,8 +49,8 @@ export const mountComponent = (el: HTMLElement, isChild = false) => {
     simpleEl.$props = props
     simpleEl.$refs = refs
     simpleEl.$refsAll = refsAll
-    simpleEl.$options = component.options
-    simpleEl.$component = component.setup(ctx) || {}
+    simpleEl.$definition = component.definition
+    simpleEl.$component = component.setup(ctx) ?? {}
   }
 
   if (!isChild) mountChildComponents(el)

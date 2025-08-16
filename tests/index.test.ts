@@ -1,10 +1,7 @@
 import { expect, it, vi } from 'vitest'
-import {
-  mountComponent,
-  mountComponents,
-  registerComponent,
-  SimpleElement
-} from '../src'
+import { define, registerComponent } from '../src'
+import { SimpleElement } from '../src/types/component'
+import { mountComponent, mountComponents } from '../src/mount'
 
 it('mounts a component', () => {
   const setup = vi.fn()
@@ -129,7 +126,7 @@ it(`parses props`, () => {
     ></div>
   `
 
-  const options = {
+  const def = define({
     props: {
       number: Number,
       string: String,
@@ -137,10 +134,10 @@ it(`parses props`, () => {
       array: Array,
       obj: Object
     }
-  }
+  })
 
   let props: any
-  registerComponent('test', options, ctx => (props = ctx.props))
+  registerComponent('test', def, ctx => (props = ctx.props))
   mountComponents()
 
   expect(props.number).toBe(1)
@@ -154,7 +151,7 @@ it(`provides default values for props`, () => {
   document.body.innerHTML = `<div data-simple-component="test"></div>`
   const el = document.querySelector('div')
 
-  const options = {
+  const def = define({
     props: {
       number: 10,
       string: 'hello',
@@ -162,10 +159,10 @@ it(`provides default values for props`, () => {
       array: () => [],
       obj: () => ({})
     }
-  }
+  })
 
   let props: any
-  registerComponent('test', options, ctx => (props = ctx.props))
+  registerComponent('test', def, ctx => (props = ctx.props))
   mountComponents()
 
   expect(props.number).toBe(10)
@@ -179,15 +176,15 @@ it(`adds default values to the dataset`, () => {
   document.body.innerHTML = `<div data-simple-component="test" data-provided="provided"></div>`
   const el = document.querySelector('div')
 
-  const options = {
+  const def = define({
     props: {
       missing: 10,
       provided: 'default',
       ignore: Number
     }
-  }
+  })
 
-  registerComponent('test', options, () => {})
+  registerComponent('test', def, () => {})
   mountComponents()
 
   expect(el?.dataset.missing).toBe('10')
@@ -207,7 +204,7 @@ it('interferes prop types from default values', () => {
     ></div>
   `
 
-  const options = {
+  const def = define({
     props: {
       number: 42,
       string: 'default',
@@ -215,10 +212,10 @@ it('interferes prop types from default values', () => {
       array: () => [],
       obj: () => ({})
     }
-  }
+  })
 
   let props: any
-  registerComponent('test', options, ctx => (props = ctx.props))
+  registerComponent('test', def, ctx => (props = ctx.props))
   mountComponents()
 
   expect(props.number).toBe(1)
@@ -266,13 +263,9 @@ it(`exposes the component's props`, () => {
   document.body.innerHTML = `
     <div data-simple-component="test" id="my-id"></div>
   `
-  const options = { props: { prop: 10 } }
+  const def = define({ props: { prop: 10 } })
   let props: any
-  const component = registerComponent(
-    'test',
-    options,
-    ctx => (props = ctx.props)
-  )
+  const component = registerComponent('test', def, ctx => (props = ctx.props))
   mountComponents()
 
   const el = document.getElementById('my-id') as SimpleElement<typeof component>
@@ -290,4 +283,21 @@ it(`exposes the component's setup function's return value`, () => {
   mountComponents(document.body)
   const el = document.getElementById('my-id') as SimpleElement<typeof component>
   expect(el.$component).toBe(exposed)
+})
+
+it(`exposes the component's definition`, () => {
+  const def = define({
+    el: HTMLButtonElement,
+    props: { prop: 10 },
+    events: { count: Number }
+  })
+  const component = registerComponent('test', def, () => {})
+
+  document.body.innerHTML = `
+    <div data-simple-component="test" id="my-id"></div>
+  `
+
+  mountComponents(document.body)
+  const el = document.getElementById('my-id') as SimpleElement<typeof component>
+  expect(el.$definition).toBe(def)
 })

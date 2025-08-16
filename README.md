@@ -15,13 +15,13 @@ npm i @very-simple/components
 ```js
 // components/gallery.js
 
-import { registerComponent, defineOptions } from '@very-simple/components'
+import { registerComponent, define } from '@very-simple/components'
 
-const options = defineOptions({
+const def = define({
   props: { loop: Boolean }
 })
 
-registerComponent('gallery', options, ({ el, props, refs, refsAll }) => {
+registerComponent('gallery', def, ({ el, props, refs, refsAll }) => {
   // Props are read from el's dataset and are automatically converted to the correct
   // type. Default values are also possible, see documentation.
   const { loop } = props
@@ -104,12 +104,12 @@ type Context = {
 }
 ```
 
-### Register a Component with Options
+### Register a Component with a Definition
 
-By passing along `options`, you can provide additional type hints and automatically parse props from the element's dataset to the correct type.
+By passing along `definition`, you can provide additional type hints and automatically parse props from the element's dataset to the correct type.
 
 ```ts
-const options = defineOptions({
+const def = define({
   // Provide a type for the element (default will be HTMLElement)
   el: HTMLImageElement,
 
@@ -132,7 +132,7 @@ const options = defineOptions({
   }
 })
 
-registerComponent('my-name', options, (ctx: Context) => {})
+registerComponent('my-name', def, (ctx: Context) => {})
 ```
 
 ### Mount a single Component
@@ -166,11 +166,9 @@ to mount:
 `props`, passed to the component's setup function can read from / write to the component elements dataset. By default all values are strings (as is the normal behavior with an element's dataset). But by providing types and default values for props, these values will be automatically converted to the correct type!
 
 ```ts
-const options = defineOptions({
-  props: { count: 0 }
-})
+const def = define({ props: { count: 0 } })
 
-registerComponent('my-component', options, ({ el, props }) => {
+registerComponent('my-component', def, ({ el, props }) => {
   // If the element hasn't `data-count` specified, this will output the default
   // value `0`.
   console.log(props.count) // => 0
@@ -184,14 +182,12 @@ registerComponent('my-component', options, ({ el, props }) => {
 This also works for complex data types:
 
 ```ts
-const options = defineOptions({
-  props: { todos: [] as string[] }
-})
+const def = define({ props: { todos: [] as string[] } })
 
 // Lets say the html for the component looks like this:
 // <div data-simple-component="todo" data-todos='["mount components!", "enjoy"]'>
 
-registerComponent('todo', options, ({ props }) => {
+registerComponent('todo', def, ({ props }) => {
   console.log(props.todos[0]) // => 'mount components!'
 })
 ```
@@ -246,11 +242,11 @@ Refs are of type HTMLElement by default, but it can be useful to define a more
 specific type for some of them:
 
 ```ts
-const options = defineOptions({
+const def = define({
   refs: { img: HTMLImageElement, videos: HTMLVideoElement }
 })
 
-registerComponent('my-component', options, ({ refs, refsAll }) => {
+registerComponent('my-component', def, ({ refs, refsAll }) => {
   const { container, img } = refs
   // container -> HTMLElement
   // img -> HTMLImageElement
@@ -270,10 +266,9 @@ export default registerComponent('child', () => {})
 // parent.ts
 import Child from './child.ts'
 
-const options = defineOptions({
-  refs: { theChild: Child }
-})
-registerComponent('parent', options, ({ refs }) => {
+const def = define({ refs: { theChild: Child } })
+
+registerComponent('parent', def, ({ refs }) => {
   // ...
 })
 ```
@@ -304,11 +299,11 @@ Referencing the parent component by it's name as above is the most common scenar
 Components try to stay as close to native APIs as possible. Therefore events are just [CustomEvent](https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent), but they can be fully typed:
 
 ```ts
-const options = defineOptions({
+const def = define({
   events: { updateCounter: Number, close: null }
 })
 
-registerComponent('my-component', options, ({ el, ComponentEvent }) => {
+registerComponent('my-component', def, ({ el, ComponentEvent }) => {
   // These will be autocompleted and generate type-errors if you forget, for
   // example, the value for the `updateCounter` event.
   el.dispatchEvent(new ComponentEvent('updateCounter', { detail: 10 }))
@@ -323,8 +318,8 @@ This also works if you listen to a component's event from outside the component'
 
 ```ts
 // my-component.ts
-const options = defineOptions({ events: { updateCounter: Number } })
-export default registerComponent('my-component', options, () => {})
+const def = define({ events: { updateCounter: Number } })
+export default registerComponent('my-component', def, () => {})
 
 // index.ts
 import MyComponent from './my-component.ts'

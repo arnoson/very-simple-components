@@ -1,16 +1,11 @@
-import {
-  registerComponent,
-  mountComponents,
-  SimpleElement,
-  defineOptions
-} from '.'
+import { registerComponent, mountComponents, define } from '.'
 
-const counterOptions = defineOptions({
+const counterDef = define({
   props: { count: 0 },
   events: { count: Number }
 })
 
-registerComponent('counter', counterOptions, ctx => {
+registerComponent('counter', counterDef, ctx => {
   const { el, props, ComponentEvent } = ctx
   const { count, countDisplay } = ctx.refs
 
@@ -24,11 +19,9 @@ registerComponent('counter', counterOptions, ctx => {
   update(props.count)
 })
 
-const todosOptions = {
-  props: { todos: [] as string[] }
-}
+const todosDef = define({ props: { todos: [] as string[] } })
 
-registerComponent('todos', todosOptions, ({ props }) => {
+registerComponent('todos', todosDef, ({ props }) => {
   console.log(props.todos)
 
   props.todos = [...props.todos, 'three']
