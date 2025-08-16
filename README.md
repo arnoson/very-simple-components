@@ -17,9 +17,7 @@ npm i @very-simple/components
 
 import { registerComponent, define } from '@very-simple/components'
 
-const def = define({
-  props: { loop: Boolean }
-})
+const def = define({ props: { loop: Boolean } })
 
 registerComponent('gallery', def, ({ el, props, refs, refsAll }) => {
   // Props are read from el's dataset and are automatically converted to the correct
