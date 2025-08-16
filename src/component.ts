@@ -6,7 +6,7 @@ import {
 
 export const components: Record<string, SimpleComponent<any>> = {}
 export const getComponent = (el: HTMLElement) => {
-  const name = el.dataset.simpleComponent
+  const name = el.dataset.component
   return name ? components[name] : undefined
 }
 

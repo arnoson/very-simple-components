@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -7,16 +7,16 @@
     <title>Document</title>
   </head>
   <body>
-    <div data-simple-component="counter" id="counter">
+    <div data-component="counter" id="counter">
       <span data-ref="countDisplay">0</span>
-      <div data-simple-component="fu">
-        <div data-simple-component="bar">
+      <div data-component="fu">
+        <div data-component="bar">
           <button data-ref="counter/count">+</button>
         </div>
       </div>
     </div>
 
-    <div data-simple-component="todos" data-todos='["one", "two"]'></div>
+    <div data-component="todos" data-todos='["one", "two"]'></div>
 
     <script type="module" src="./src/dev.ts"></script>
   </body>

@@ -25,7 +25,7 @@ export const getRefs = (el: HTMLElement) => {
     const [parent, name] = refEl.dataset.ref!.split('/')
 
     const selector = parent.match(/^\((.*)\)$/)?.[1]
-    const parentSelector = selector ?? `[data-simple-component='${parent}']`
+    const parentSelector = selector ?? `[data-component='${parent}']`
 
     const parentEl = refEl.closest(parentSelector)
     if (parentEl === el) addRef(name, refEl)

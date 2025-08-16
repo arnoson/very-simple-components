@@ -55,7 +55,7 @@ registerComponent('gallery', def, ({ el, props, refs, refsAll }) => {
 ```html
 <!-- index.html -->
 
-<div id="my-gallery" data-simple-component="gallery" data-loop="true">
+<div id="my-gallery" data-component="gallery" data-loop="true">
   <div data-ref="slides">A</div>
   <div data-ref="slides">B</div>
   <div data-ref="slides">C</div>
@@ -68,7 +68,7 @@ registerComponent('gallery', def, ({ el, props, refs, refsAll }) => {
   // We only have to import the component, it will register itself.
   import './components/gallery.js'
 
-  // This will look for any elements with a `data-simple-component` attribute and
+  // This will look for any elements with a `data-component` attribute and
   // mount the corresponding component.
   mountComponents()
 </script>
@@ -156,7 +156,7 @@ Sometimes it is useful to skip big DOM elements when searching for components
 to mount:
 
 ```html
-<div data-simple-ignore>
+<div data-ignore>
   <!-- a lot of DOM elements ... -->
 </div>
 ```
@@ -185,7 +185,7 @@ This also works for complex data types:
 const def = define({ props: { todos: [] as string[] } })
 
 // Lets say the html for the component looks like this:
-// <div data-simple-component="todo" data-todos='["mount components!", "enjoy"]'>
+// <div data-component="todo" data-todos='["mount components!", "enjoy"]'>
 
 registerComponent('todo', def, ({ props }) => {
   console.log(props.todos[0]) // => 'mount components!'
@@ -204,7 +204,7 @@ registerComponent('my-component', ({ refs, refsAll, props }) => {
 ```
 
 ```html
-<div data-simple-component="my-component" id="my-id" data-message="Hello :~)">
+<div data-component="my-component" id="my-id" data-message="Hello :~)">
   <button data-ref="button">Click me!</button>
 </div>
 ```
@@ -274,8 +274,8 @@ registerComponent('parent', def, ({ refs }) => {
 ```
 
 ```html
-<div data-simple-component="parent">
-  <div data-simple-component="child" data-ref="theChild"></div>
+<div data-component="parent">
+  <div data-component="child" data-ref="theChild"></div>
 </div>
 ```
 
@@ -284,8 +284,8 @@ registerComponent('parent', def, ({ refs }) => {
 Sometimes you may want to associate a ref that is nested inside another component with the parent component instead. You can do so by providing a path with the parent components name: `parent/ref`.
 
 ```html
-<div data-simple-component="parent">
-  <div data-simple-component="child">
+<div data-component="parent">
+  <div data-component="child">
     <button data-ref="parent/button">I'm a ref of `parent`</button>
     <button data-ref="button">I'm a ref of `child`</button>
   </div>

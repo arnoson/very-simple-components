@@ -8,7 +8,7 @@ it('mounts a component', () => {
   registerComponent('test', setup)
 
   const div = document.createElement('div')
-  div.dataset.simpleComponent = 'test'
+  div.dataset.component = 'test'
 
   mountComponent(div)
   expect(setup).toBeCalledWith({
@@ -28,9 +28,9 @@ it('mounts multiple components', () => {
   registerComponent('b', componentB)
 
   document.body.innerHTML = `
-    <div data-simple-component="a"></div>
-    <div data-simple-component="a"></div>
-    <div data-simple-component="b"></div>
+    <div data-component="a"></div>
+    <div data-component="a"></div>
+    <div data-component="b"></div>
   `
   mountComponents(document.body)
   expect(componentA).toBeCalledTimes(2)
@@ -42,7 +42,7 @@ it(`doesn't mount an already mounted component`, () => {
   registerComponent('test', component)
 
   const div = document.createElement('div')
-  div.dataset.simpleComponent = 'test'
+  div.dataset.component = 'test'
 
   mountComponent(div)
   mountComponent(div)
@@ -50,13 +50,13 @@ it(`doesn't mount an already mounted component`, () => {
   expect(component).toBeCalledTimes(1)
 })
 
-it(`doesn't walk elements with data-simple-ignore attribute`, () => {
+it(`doesn't walk elements with data-ignore attribute`, () => {
   const component = vi.fn()
   registerComponent('test', component)
 
   document.body.innerHTML = `
-    <div data-simple-component="test">
-      <div data-simple-ignore data-ref="ref">
+    <div data-component="test">
+      <div data-ignore data-ref="ref">
         <div data-ref="ref"></div>
       </div>
     </div>
@@ -70,9 +70,9 @@ it('provides a record of single refs', () => {
   registerComponent('test', component)
 
   document.body.innerHTML = `
-    <div data-simple-component="test" id="my-test">
+    <div data-component="test" id="my-test">
       <div id="ref1" data-ref="myRef"></div>
-      <div data-simple-component="another-component">
+      <div data-component="another-component">
         <div data-ref="otherComponentsRef"></div>
         <div id="ref2" data-ref="test/deepRef"></div>
         <div id="ref3" data-ref="(#my-test)/selectorDeepRef"></div>
@@ -93,11 +93,11 @@ it('provides a record of groups of refs with the same name', () => {
   registerComponent('test', component)
 
   document.body.innerHTML = `
-    <div data-simple-component="test">
+    <div data-component="test">
       <div id="ref1" data-ref="myRef"></div>
       <div id="ref2" data-ref="myRef"></div>
       <div id="ref3" data-ref="myRef"></div>
-      <div data-simple-component="another-component">
+      <div data-component="another-component">
         <div id="ref4" data-ref="test/myRef"></div>
       </div>
     </div>
@@ -117,7 +117,7 @@ it('provides a record of groups of refs with the same name', () => {
 it(`parses props`, () => {
   document.body.innerHTML = `
     <div
-      data-simple-component="test"
+      data-component="test"
       data-number="1"
       data-string="text"
       data-bool="true"
@@ -148,7 +148,7 @@ it(`parses props`, () => {
 })
 
 it(`provides default values for props`, () => {
-  document.body.innerHTML = `<div data-simple-component="test"></div>`
+  document.body.innerHTML = `<div data-component="test"></div>`
   const el = document.querySelector('div')
 
   const def = define({
@@ -173,7 +173,7 @@ it(`provides default values for props`, () => {
 })
 
 it(`adds default values to the dataset`, () => {
-  document.body.innerHTML = `<div data-simple-component="test" data-provided="provided"></div>`
+  document.body.innerHTML = `<div data-component="test" data-provided="provided"></div>`
   const el = document.querySelector('div')
 
   const def = define({
@@ -195,7 +195,7 @@ it(`adds default values to the dataset`, () => {
 it('interferes prop types from default values', () => {
   document.body.innerHTML = `
     <div
-      data-simple-component="test"
+      data-component="test"
       data-number="1"
       data-string="text"
       data-bool="true"
@@ -229,7 +229,7 @@ it(`exposes the component's refs`, () => {
   const component = registerComponent('test', () => {})
 
   document.body.innerHTML = `
-    <div data-simple-component="test" id="my-id">
+    <div data-component="test" id="my-id">
       <div id="ref" data-ref="ref"></div>
     </div>
   `
@@ -243,7 +243,7 @@ it(`exposes the component's refsAll`, () => {
   const component = registerComponent('test', () => {})
 
   document.body.innerHTML = `
-    <div data-simple-component="test" id="my-id">
+    <div data-component="test" id="my-id">
       <div id="ref1" data-ref="myRef"></div>
       <div id="ref2" data-ref="myRef"></div>
     </div>
@@ -261,7 +261,7 @@ it(`exposes the component's refsAll`, () => {
 
 it(`exposes the component's props`, () => {
   document.body.innerHTML = `
-    <div data-simple-component="test" id="my-id"></div>
+    <div data-component="test" id="my-id"></div>
   `
   const def = define({ props: { prop: 10 } })
   let props: any
@@ -277,7 +277,7 @@ it(`exposes the component's setup function's return value`, () => {
   const component = registerComponent('test', () => exposed)
 
   document.body.innerHTML = `
-    <div data-simple-component="test" id="my-id"></div>
+    <div data-component="test" id="my-id"></div>
   `
 
   mountComponents(document.body)
@@ -294,7 +294,7 @@ it(`exposes the component's definition`, () => {
   const component = registerComponent('test', def, () => {})
 
   document.body.innerHTML = `
-    <div data-simple-component="test" id="my-id"></div>
+    <div data-component="test" id="my-id"></div>
   `
 
   mountComponents(document.body)

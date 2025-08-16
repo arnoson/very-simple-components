@@ -9,7 +9,7 @@ import { getRefs } from './refs'
 import { SimpleComponentEvent, SimpleElement } from './types'
 
 const mountChildComponents = (el: HTMLElement) => {
-  const elements = el.querySelectorAll<HTMLElement>('[data-simple-component]')
+  const elements = el.querySelectorAll<HTMLElement>('[data-component]')
   for (let i = 0; i < elements.length; i++) {
     const el = elements[i]
     mountComponent(el, true)
