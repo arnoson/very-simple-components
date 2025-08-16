@@ -1,16 +1,13 @@
-import {
-  registerComponent,
-  mountComponents,
-  SimpleElement,
-  defineOptions
-} from '.'
+import { define, registerComponent } from '.'
+import { registerDirective } from './directive'
+import { mount } from './mount'
 
-const counterOptions = defineOptions({
+const counterDef = define({
   props: { count: 0 },
   events: { count: Number }
 })
 
-registerComponent('counter', counterOptions, ctx => {
+registerComponent('counter', counterDef, ctx => {
   const { el, props, ComponentEvent } = ctx
   const { count, countDisplay } = ctx.refs
 
@@ -24,14 +21,55 @@ registerComponent('counter', counterOptions, ctx => {
   update(props.count)
 })
 
-const todosOptions = {
+const todosDef = define({
   props: { todos: [] as string[] }
-}
+})
 
-registerComponent('todos', todosOptions, ({ props }) => {
+registerComponent('todos', todosDef, ({ props }) => {
   console.log(props.todos)
 
   props.todos = [...props.todos, 'three']
 })
 
-mountComponents()
+const autoHideDef = define({
+  modifiers: { threshold: 60, direction: 'down' }
+})
+
+registerDirective('auto-hide', autoHideDef, ({ el, modifiers }) => {
+  let direction: 'up' | 'down'
+  let isScrolling = false
+  let lastScroll = 0
+  let startScroll = 0
+
+  console.log(modifiers)
+
+  window.addEventListener('scroll', () => {
+    const scroll = document.documentElement.scrollTop
+
+    if (!isScrolling) {
+      startScroll = lastScroll = scroll
+      isScrolling = true
+      return
+    }
+
+    const distance = Math.abs(startScroll - scroll)
+    const lastDirection = direction
+    direction = scroll > lastScroll ? 'down' : 'up'
+
+    if (direction !== lastDirection) {
+      startScroll = lastScroll = scroll
+      isScrolling = true
+      return
+    }
+
+    if (distance > modifiers.threshold) {
+      el.hidden = direction === modifiers.direction
+      isScrolling = false
+      return
+    }
+
+    lastScroll = scroll
+  })
+})
+
+mount()

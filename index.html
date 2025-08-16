@@ -1,23 +1,36 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Very Simple Components</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css"
+    />
   </head>
-  <body>
-    <div data-simple-component="counter" id="counter">
-      <span data-ref="countDisplay">0</span>
-      <div data-simple-component="fu">
-        <div data-simple-component="bar">
-          <button data-ref="counter/count">+</button>
+  <body style="height: 400vh">
+    <header
+      data-simple-directive="auto-hide[threshold=100] fu bar"
+      style="position: sticky; top: 0"
+    >
+      Header
+    </header>
+
+    <main>
+      <div data-simple-component="counter" id="counter">
+        <span data-ref="countDisplay">0</span>
+        <div data-simple-component="fu">
+          <div data-simple-component="bar">
+            <button data-ref="counter/count">+</button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div data-simple-component="todos" data-todos='["one", "two"]'></div>
+      <div data-simple-component="todos" data-todos='["one", "two"]'></div>
+    </main>
 
-    <script type="module" src="./src/dev.ts"></script>
+    <script type="module" src="./dist/index.js"></script>
   </body>
 </html>

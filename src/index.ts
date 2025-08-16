@@ -1,3 +1,4 @@
-export { registerComponent, defineOptions } from './registerComponent'
-export { mountComponent, mountComponents } from './mountComponent'
+export { registerComponent } from './component'
+export { mount } from './mount'
+export * from './define'
 export * from './types'

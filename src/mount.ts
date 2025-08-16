@@ -1,3 +1,6 @@
+import { getComponent } from './component'
+import { directives } from './directive'
+import { parseModifiers } from './modifiers'
 import {
   createPropsProxy,
   getDefaultProp,
@@ -5,8 +8,8 @@ import {
   stringifyProp
 } from './props'
 import { getRefs } from './refs'
-import { getComponent } from './registerComponent'
-import { SimpleComponentEvent, SimpleElement } from './types'
+import { SimpleComponentEvent, SimpleElement } from './types/component'
+import { SimpleDirectiveElement } from './types/directive'
 
 const mountChildComponents = (el: HTMLElement) => {
   const elements = el.querySelectorAll<HTMLElement>('[data-simple-component]')
@@ -24,7 +27,7 @@ export const mountComponent = (el: HTMLElement, isChild = false) => {
   if (!isInitialized && component) {
     const simpleEl = el as SimpleElement<typeof component>
 
-    const propsDefinitions = component.options.props
+    const propsDefinitions = component.definition.props
     const props = propsDefinitions
       ? createPropsProxy(el, propsDefinitions)
       : el.dataset
@@ -49,8 +52,8 @@ export const mountComponent = (el: HTMLElement, isChild = false) => {
     simpleEl.$props = props
     simpleEl.$refs = refs
     simpleEl.$refsAll = refsAll
-    simpleEl.$options = component.options
-    simpleEl.$component = component.setup(ctx) || {}
+    simpleEl.$def = component.definition
+    simpleEl.$component = component.setup(ctx) ?? {}
   }
 
   if (!isChild) mountChildComponents(el)
@@ -59,4 +62,36 @@ export const mountComponent = (el: HTMLElement, isChild = false) => {
 /** Mount all components inside the element */
 export const mountComponents = (root = document.body) => {
   mountChildComponents(root)
+}
+
+/** Mount all directives on the element*/
+export const mountDirectives = (el: HTMLElement) => {
+  const directiveEl = el as SimpleDirectiveElement
+  directiveEl.$directives ??= {}
+
+  const name = directiveEl.dataset.simpleDirective!
+  const matches = name.matchAll(/(?<name>[\w-]+)(?<modifiers>\[[\w\-=]+\])?/g)
+  for (const { groups } of matches) {
+    if (!groups) continue
+    const { name, modifiers: modifiersSerialized } = groups
+    const directive = directives[name]
+    const isInitialized = !!directiveEl.$directives[name]
+    if (!directive || isInitialized) continue
+
+    const modifiers = parseModifiers(
+      modifiersSerialized,
+      directive.definition.modifiers
+    )
+    directiveEl.$directives[name] =
+      directive.setup({ el: directiveEl, modifiers }) ?? {}
+  }
+}
+
+/** Mount all components and directives inside the element */
+export const mount = (root = document.body) => {
+  mountComponents(root)
+  const elements = root.querySelectorAll<SimpleDirectiveElement>(
+    '[data-simple-directive]'
+  )
+  elements.forEach(mountDirectives)
 }

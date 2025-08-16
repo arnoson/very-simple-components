@@ -15,11 +15,9 @@ npm i @very-simple/components
 ```js
 // components/gallery.js
 
-import { registerComponent, defineOptions } from '@very-simple/components'
+import { registerComponent, define } from '@very-simple/components'
 
-const options = defineOptions({
-  props: { loop: Boolean }
-})
+const def = define({ props: { loop: Boolean } })
 
 registerComponent('gallery', options, ({ el, props, refs, refsAll }) => {
   // Props are read from el's dataset and are automatically converted to the correct
@@ -64,13 +62,13 @@ registerComponent('gallery', options, ({ el, props, refs, refsAll }) => {
 </div>
 
 <script type="module">
-  import { mountComponents } from '@very-simple/components'
+  import { mount } from '@very-simple/components'
   // We only have to import the component, it will register itself.
   import './components/gallery.js'
 
-  // This will look for any elements with a `data-simple-component` attribute and
-  // mount the corresponding component.
-  mountComponents()
+  // This will look for any elements with either a `data-simple-component`
+  // or an `data-simple-directive` attribute and mount the corresponding component/directive.
+  mount()
 </script>
 ```
 
@@ -104,12 +102,12 @@ type Context = {
 }
 ```
 
-### Register a Component with Options
+### Register a Component with a Definition
 
-By passing along `options`, you can provide additional type hints and automatically parse props from the element's dataset to the correct type.
+By passing along `definition`, you can provide additional type hints, default values and automatically parse props from the element's dataset to the correct type.
 
 ```ts
-const options = defineOptions({
+const def = define({
   // Provide a type for the element (default will be HTMLElement)
   el: HTMLImageElement,
 
@@ -132,22 +130,15 @@ const options = defineOptions({
   }
 })
 
-registerComponent('my-name', options, (ctx: Context) => {})
+registerComponent('my-name', def, (ctx: Context) => {})
 ```
 
-### Mount a single Component
+### Mount
 
-Note: this will also mount any child components.
-
-```ts
-mountComponent(el: HTMLElement)
-```
-
-### Mount all Components
+Mount all components and directives
 
 ```ts
-// If no `root` is provided, `<body>` is used.
-mountComponent(root?: HTMLElement)
+mount(root?: HTMLElement)
 ```
 
 ### Ignore Elements
@@ -166,9 +157,7 @@ to mount:
 `props`, passed to the component's setup function can read from / write to the component elements dataset. By default all values are strings (as is the normal behavior with an element's dataset). But by providing types and default values for props, these values will be automatically converted to the correct type!
 
 ```ts
-const options = defineOptions({
-  props: { count: 0 }
-})
+const def = define({ props: { count: 0 } })
 
 registerComponent('my-component', options, ({ el, props }) => {
   // If the element hasn't `data-count` specified, this will output the default
@@ -184,9 +173,7 @@ registerComponent('my-component', options, ({ el, props }) => {
 This also works for complex data types:
 
 ```ts
-const options = defineOptions({
-  props: { todos: [] as string[] }
-})
+const def = define({ props: { todos: [] as string[] } })
 
 // Lets say the html for the component looks like this:
 // <div data-simple-component="todo" data-todos='["mount components!", "enjoy"]'>
@@ -246,7 +233,7 @@ Refs are of type HTMLElement by default, but it can be useful to define a more
 specific type for some of them:
 
 ```ts
-const options = defineOptions({
+const def = define({
   refs: { img: HTMLImageElement, videos: HTMLVideoElement }
 })
 
@@ -270,9 +257,7 @@ export default registerComponent('child', () => {})
 // parent.ts
 import Child from './child.ts'
 
-const options = defineOptions({
-  refs: { theChild: Child }
-})
+const def = define({ refs: { theChild: Child } })
 registerComponent('parent', options, ({ refs }) => {
   // ...
 })
@@ -304,7 +289,7 @@ Referencing the parent component by it's name as above is the most common scenar
 Components try to stay as close to native APIs as possible. Therefore events are just [CustomEvent](https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent), but they can be fully typed:
 
 ```ts
-const options = defineOptions({
+const def = define({
   events: { updateCounter: Number, close: null }
 })
 
@@ -323,7 +308,7 @@ This also works if you listen to a component's event from outside the component'
 
 ```ts
 // my-component.ts
-const options = defineOptions({ events: { updateCounter: Number } })
+const def = define({ events: { updateCounter: Number } })
 export default registerComponent('my-component', options, () => {})
 
 // index.ts
@@ -335,4 +320,34 @@ const el = document.getElementById<MyComponentElement>('my-id')
 
 // This will be fully typed:
 el.addEventListener('updateCounter', ({ detail: count }) => console.log(count))
+```
+
+### Directives
+
+Sometimes you don't need a full component to attach simple behavior to an element. In these cases, you can use a directive instead. Directives don't have refs, typed events and instead of props they only have modifiers, which can only be primitive values (`string`, `number`, `boolean`).
+
+```ts
+// auto-hide.ts
+const def = define({ modifiers: { direction = 'down', threshold = 60 } })
+export default registerDirective('auto-hide', def, ({ el, modifiers }) => {
+  el.addEventListener('scroll', () => {
+    // ... logic to hide the element when the user scrolls up or down ...
+  })
+})
+```
+
+```html
+<header data-simple-directive="auto-hide" />
+```
+
+Or with modifiers:
+
+```html
+<header data-simple-directive="auto-hide[direction=up, threshold=60]" />
+```
+
+Or use multiple directives on the same element:
+
+```html
+<header data-simple-directive="auto-hide[direction=up] my-other-directive" />
 ```

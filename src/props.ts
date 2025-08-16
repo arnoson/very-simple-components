@@ -1,4 +1,8 @@
-export const isBuiltInTypeConstructor = (value: any) =>
+import { BuiltInTypeConstructor } from './types/base'
+
+export const isBuiltInTypeConstructor = (
+  value: any
+): value is BuiltInTypeConstructor =>
   [Number, String, Boolean, Array, Object].includes(value)
 
 export const parseProp = (value: any, type: string) =>

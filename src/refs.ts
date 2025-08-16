@@ -1,5 +1,4 @@
-import { SimpleRefs, SimpleRefsAll } from './types'
-import { walkComponent } from './walkComponent'
+import { SimpleRefs, SimpleRefsAll } from './types/component'
 
 export const getRefs = (el: HTMLElement) => {
   const refsAll: SimpleRefsAll = {}
@@ -36,4 +35,22 @@ export const getRefs = (el: HTMLElement) => {
   )
 
   return { refs, refsAll }
+}
+
+const walkComponent = (
+  el: HTMLElement,
+  callback: (el: HTMLElement, isChildComponent: boolean) => any,
+  isChild = false
+) => {
+  if (!isChild) callback(el, false)
+
+  let node = el.firstElementChild as HTMLElement
+  while (node) {
+    if (!node.hasAttribute('data-simple-ignore')) {
+      const isChildComponent = node.hasAttribute('data-simple-component')
+      callback(node, isChildComponent)
+      if (!isChildComponent) walkComponent(node, callback, true)
+    }
+    node = node.nextElementSibling as HTMLElement
+  }
 }
