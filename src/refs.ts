@@ -1,5 +1,4 @@
 import { SimpleRefs, SimpleRefsAll } from './types'
-import { walkComponent } from './walkComponent'
 
 export const getRefs = (el: HTMLElement) => {
   const refsAll: SimpleRefsAll = {}
@@ -8,27 +7,22 @@ export const getRefs = (el: HTMLElement) => {
     refsAll[name].push(el)
   }
 
-  walkComponent(el, el => {
-    const { ref } = el.dataset
-    if (!ref) return
+  el.querySelectorAll<HTMLElement>('[data-ref]').forEach(refEl => {
+    const value = refEl.dataset.ref!
+    const isDeepRef = value.includes('/')
 
-    const isDeepRef = ref.includes('/')
-    if (isDeepRef) return
+    if (isDeepRef) {
+      const [parent, name] = value.split('/')
 
-    addRef(ref, el)
-  })
+      const selector = parent.match(/^\((.*)\)$/)?.[1]
+      const parentSelector = selector ?? `[data-component='${parent}']`
 
-  // Deep refs can't be handled during DOM walk, since we stop at child
-  // components.
-  const deepRefs = el.querySelectorAll<HTMLElement>('[data-ref*="/"]')
-  deepRefs.forEach(refEl => {
-    const [parent, name] = refEl.dataset.ref!.split('/')
-
-    const selector = parent.match(/^\((.*)\)$/)?.[1]
-    const parentSelector = selector ?? `[data-component='${parent}']`
-
-    const parentEl = refEl.closest(parentSelector)
-    if (parentEl === el) addRef(name, refEl)
+      const parentEl = refEl.closest(parentSelector)
+      if (parentEl === el) addRef(name, refEl)
+    } else {
+      const closestComponent = refEl.closest('[data-component]')
+      if (closestComponent === el) addRef(value, refEl)
+    }
   })
 
   const refs: SimpleRefs = Object.fromEntries(

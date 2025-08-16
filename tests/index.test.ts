@@ -50,21 +50,6 @@ it(`doesn't mount an already mounted component`, () => {
   expect(component).toBeCalledTimes(1)
 })
 
-it(`doesn't walk elements with data-ignore attribute`, () => {
-  const component = vi.fn()
-  registerComponent('test', component)
-
-  document.body.innerHTML = `
-    <div data-component="test">
-      <div data-ignore data-ref="ref">
-        <div data-ref="ref"></div>
-      </div>
-    </div>
-  `
-  mountComponents(document.body)
-  expect(component).toBeCalledWith(expect.objectContaining({ refs: {} }))
-})
-
 it('provides a record of single refs', () => {
   const component = vi.fn()
   registerComponent('test', component)

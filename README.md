@@ -150,17 +150,6 @@ mountComponent(el: HTMLElement)
 mountComponent(root?: HTMLElement)
 ```
 
-### Ignore Elements
-
-Sometimes it is useful to skip big DOM elements when searching for components
-to mount:
-
-```html
-<div data-ignore>
-  <!-- a lot of DOM elements ... -->
-</div>
-```
-
 ### Props
 
 `props`, passed to the component's setup function can read from / write to the component elements dataset. By default all values are strings (as is the normal behavior with an element's dataset). But by providing types and default values for props, these values will be automatically converted to the correct type!
