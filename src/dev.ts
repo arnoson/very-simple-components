@@ -1,4 +1,4 @@
-import { registerComponent, mountComponents, define } from '.'
+import { registerComponent, mountComponents, define, unmountComponent } from '.'
 
 const counterDef = define({
   props: { count: 0 },
@@ -25,6 +25,25 @@ registerComponent('todos', todosDef, ({ props }) => {
   console.log(props.todos)
 
   props.todos = [...props.todos, 'three']
+})
+
+registerComponent('ticker', ({ el, signal }) => {
+  let tick = 0
+  const id = setInterval(() => console.log(tick++), 1000)
+
+  window.addEventListener('resize', () => console.log('resize'), { signal })
+  window.addEventListener(
+    'click',
+    () => {
+      unmountComponent(el)
+      el.remove()
+    },
+    { signal }
+  )
+
+  return {
+    cleanup: () => clearInterval(id)
+  }
 })
 
 mountComponents()

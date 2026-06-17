@@ -44,16 +44,41 @@ export const mountComponent = (el: HTMLElement, isChild = false) => {
 
     const { refs, refsAll } = getRefs(el)
     const ComponentEvent = CustomEvent as SimpleComponentEvent
-    const ctx = { el, props, refs, refsAll, ComponentEvent }
+    const controller = new AbortController()
+    const ctx = {
+      el,
+      props,
+      refs,
+      refsAll,
+      ComponentEvent,
+      signal: controller.signal
+    }
 
     simpleEl.$props = props
     simpleEl.$refs = refs
     simpleEl.$refsAll = refsAll
     simpleEl.$definition = component.definition
-    simpleEl.$component = component.setup(ctx) ?? {}
+
+    const result = component.setup(ctx) ?? {}
+    simpleEl.$component = result
+
+    simpleEl.$destroy = () => {
+      controller.abort()
+      result.cleanup?.()
+    }
   }
 
   if (!isChild) mountChildComponents(el)
+}
+
+/** Unmount a single component, running any cleanup */
+export const unmountComponent = (el: HTMLElement) => {
+  const simpleEl = el as SimpleElement<any>
+  if (simpleEl.$destroy) {
+    simpleEl.$destroy()
+    delete (simpleEl as any).$component
+    delete (simpleEl as any).$destroy
+  }
 }
 
 /** Mount all components inside the element */

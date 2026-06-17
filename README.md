@@ -99,6 +99,10 @@ type Context = {
   // A fully typed `CustomEvent` constructor to dispatch type safe events.
   // See: #Events
   ComponentEvent: SimpleComponentEvent
+
+  // An AbortSignal that is aborted when the component is destroyed.
+  // See: #Cleanup--Destroy
+  signal: AbortSignal
 }
 ```
 
@@ -317,4 +321,44 @@ const el = document.getElementById<MyComponentElement>('my-id')
 
 // This will be fully typed:
 el.addEventListener('updateCounter', ({ detail: count }) => console.log(count))
+```
+
+### Cleanup / Destroy
+
+When a component is removed from the DOM, you can clean up resources like intervals or global event listeners.
+
+#### `signal` — for event listeners
+
+The `signal` in the component context integrates natively with `addEventListener`'s `signal` option. Event listeners registered this way are automatically removed when the component is destroyed:
+
+```ts
+registerComponent('my-component', ({ signal }) => {
+  // Automatically removed when the component is destroyed.
+  window.addEventListener('resize', onResize, { signal })
+})
+```
+
+#### `cleanup()` — for everything else
+
+For teardown that isn't an event listener (intervals, observers, etc.), return a `cleanup()` method from the setup function:
+
+```ts
+registerComponent('my-component', () => {
+  let tick = 0
+  const id = setInterval(() => console.log(tick++), 1000)
+
+  return {
+    cleanup: () => clearInterval(id)
+  }
+})
+```
+
+#### Destroying a component
+
+Call `unmountComponent(el)` to destroy a component. This aborts its signal and calls `cleanup()` if defined:
+
+```ts
+import { unmountComponent } from '@very-simple/components'
+
+unmountComponent(el)
 ```

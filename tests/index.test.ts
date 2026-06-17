@@ -1,7 +1,7 @@
 import { expect, it, vi } from 'vitest'
 import { define, registerComponent } from '../src'
 import { SimpleElement } from '../src/types/component'
-import { mountComponent, mountComponents } from '../src/mount'
+import { mountComponent, mountComponents, unmountComponent } from '../src/mount'
 
 it('mounts a component', () => {
   const setup = vi.fn()
@@ -11,13 +11,46 @@ it('mounts a component', () => {
   div.dataset.component = 'test'
 
   mountComponent(div)
-  expect(setup).toBeCalledWith({
-    el: div,
-    refs: {},
-    refsAll: {},
-    props: div.dataset,
-    ComponentEvent: CustomEvent
+  expect(setup).toHaveBeenCalledWith(
+    expect.objectContaining({
+      el: div,
+      refs: {},
+      refsAll: {},
+      props: div.dataset,
+      ComponentEvent: CustomEvent,
+      signal: expect.any(AbortSignal)
+    })
+  )
+})
+
+it('aborts signal when component is unmounted', () => {
+  const div = document.createElement('div')
+  div.dataset.component = 'signal-test'
+
+  let componentSignal: AbortSignal
+  registerComponent('signal-test', ({ signal }) => {
+    componentSignal = signal
   })
+
+  mountComponent(div)
+  expect(componentSignal!.aborted).toBe(false)
+
+  unmountComponent(div)
+  expect(componentSignal!.aborted).toBe(true)
+})
+
+it('calls cleanup() when component is unmounted', () => {
+  const div = document.createElement('div')
+  div.dataset.component = 'cleanup-test'
+
+  const cleanup = vi.fn()
+  registerComponent('cleanup-test', () => ({ cleanup }))
+
+  mountComponent(div)
+  expect(cleanup).not.toHaveBeenCalled()
+
+  unmountComponent(div)
+  expect(cleanup).toHaveBeenCalledTimes(1)
 })
 
 it('mounts multiple components', () => {
@@ -68,7 +101,7 @@ it('provides a record of single refs', () => {
   const myRef = document.querySelector('#ref1')
   const deepRef = document.querySelector('#ref2')
   const selectorDeepRef = document.querySelector('#ref3')
-  expect(component).toBeCalledWith(
+  expect(component).toHaveBeenCalledWith(
     expect.objectContaining({ refs: { myRef, deepRef, selectorDeepRef } })
   )
 })
@@ -94,7 +127,7 @@ it('provides a record of groups of refs with the same name', () => {
     document.querySelector('#ref3'),
     document.querySelector('#ref4')
   ]
-  expect(component).toBeCalledWith(
+  expect(component).toHaveBeenCalledWith(
     expect.objectContaining({ refsAll: { myRef } })
   )
 })

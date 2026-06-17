@@ -42,6 +42,7 @@ export type SimpleComponentContext<
   refs: Record<string, HTMLElement | undefined> & Partial<Refs>
   refsAll: Record<string, HTMLElement[]> & SimpleRefsAll<Refs>
   ComponentEvent: SimpleComponentEvent<SimpleEventMap<Definition['events']>>
+  signal: AbortSignal
 }
 
 /* Element with a mounted component */
@@ -49,8 +50,8 @@ export type SimpleComponentContext<
 export type SimpleElement<
   Component extends SimpleComponent,
   Definition extends SimpleComponentDefinition = Component['definition'],
-  Context extends
-    SimpleComponentContext<any> = SimpleComponentContext<Definition>,
+  Context extends SimpleComponentContext<any> =
+    SimpleComponentContext<Definition>,
   Events extends SimpleEventMap<any> = SimpleEventMap<Definition['events']>
 > = {
   addEventListener: <K extends keyof Events>(
@@ -70,4 +71,5 @@ export type SimpleElement<
   $refsAll: Context['refsAll']
   $props: Context['props']
   $definition: Definition
+  $destroy: () => void
 } & Context['el']
