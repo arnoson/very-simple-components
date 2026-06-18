@@ -1,7 +1,6 @@
 import { expect, it, vi } from 'vitest'
-import { define, component } from '../src'
-import { SimpleElement } from '../src/types/component'
-import { mount, unmount } from '../src/mount'
+import { component, define } from '../src'
+import { instance, mount, unmount } from '../src/mount'
 
 it('mounts a component', () => {
   const setup = vi.fn()
@@ -246,79 +245,16 @@ it('interferes prop types from default values', () => {
   expect(props.obj).toEqual({ hello: 'world' })
 })
 
-it(`exposes the component's refs`, () => {
-  const test = component('test', () => {})
-
-  document.body.innerHTML = `
-    <div data-component="test" id="my-id">
-      <div id="ref" data-ref="ref"></div>
-    </div>
-  `
-  const refs = { ref: document.getElementById('ref') }
-  mount(document.body)
-  const el = document.getElementById('my-id') as SimpleElement<typeof test>
-  expect(el.$refs).toEqual(refs)
-})
-
-it(`exposes the component's refsAll`, () => {
-  const test = component('test', () => {})
-
-  document.body.innerHTML = `
-    <div data-component="test" id="my-id">
-      <div id="ref1" data-ref="myRef"></div>
-      <div id="ref2" data-ref="myRef"></div>
-    </div>
-  `
-
-  const myRef = [
-    document.getElementById('ref1'),
-    document.getElementById('ref2')
-  ]
-
-  mount(document.body)
-  const el = document.getElementById('my-id') as SimpleElement<typeof test>
-  expect(el.$refsAll).toEqual({ myRef })
-})
-
-it(`exposes the component's props`, () => {
-  document.body.innerHTML = `
-    <div data-component="test" id="my-id"></div>
-  `
-  const def = define({ props: { prop: 10 } })
-  let props: any
-  const test = component('test', def, ctx => (props = ctx.props))
-  mount()
-
-  const el = document.getElementById('my-id') as SimpleElement<typeof test>
-  expect(el.$props).toBe(props)
-})
-
 it(`exposes the component's setup function's return value`, () => {
   const exposed = { test: () => {} }
-  const test = component('test', () => exposed)
+  const Test = component('test', () => exposed)
 
   document.body.innerHTML = `
     <div data-component="test" id="my-id"></div>
   `
 
   mount(document.body)
-  const el = document.getElementById('my-id') as SimpleElement<typeof test>
-  expect(el.$component).toBe(exposed)
-})
-
-it(`exposes the component's definition`, () => {
-  const def = define({
-    el: HTMLButtonElement,
-    props: { prop: 10 },
-    events: { count: Number }
-  })
-  const test = component('test', def, () => {})
-
-  document.body.innerHTML = `
-    <div data-component="test" id="my-id"></div>
-  `
-
-  mount(document.body)
-  const el = document.getElementById('my-id') as SimpleElement<typeof test>
-  expect(el.$definition).toBe(def)
+  const el = document.getElementById('my-id')
+  const test = instance(el!, Test)
+  expect(test.$component).toBe(exposed)
 })

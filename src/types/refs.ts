@@ -1,16 +1,16 @@
-import { SimpleComponent, SimpleElement } from '../types'
-import { SimpleComponentDefinition } from './component'
+import { Component, ComponentElement } from '../types'
+import { ComponentDefinition } from './component'
 
-export type SimpleRefs = Record<string, HTMLElement | SimpleElement<any>>
+export type Refs = Record<string, HTMLElement | ComponentElement<any>>
 
-export type SimpleRefsAll<R extends SimpleRefs = any> = {
+export type RefsAll<R extends Refs = any> = {
   [K in keyof R]: R[K][]
 }
 
-export type ResolveRefs<Refs extends SimpleComponentDefinition['refs']> = {
-  [K in keyof Refs]: Refs[K] extends typeof HTMLElement
-    ? Refs[K]['prototype']
-    : Refs[K] extends SimpleComponent
-      ? SimpleElement<Refs[K]>
+export type ResolveRefs<R extends ComponentDefinition['refs']> = {
+  [K in keyof R]: R[K] extends typeof HTMLElement
+    ? R[K]['prototype']
+    : R[K] extends Component
+      ? ComponentElement<R[K]>
       : never
 }

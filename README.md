@@ -98,7 +98,7 @@ type Context = {
 
   // A fully typed `CustomEvent` constructor to dispatch type safe events.
   // See: #Events
-  ComponentEvent: SimpleComponentEvent
+  ComponentEvent: ComponentEvent
 
   // An AbortSignal that is aborted when the component is destroyed.
   // See: #Cleanup--Destroy
@@ -187,48 +187,29 @@ component('todo', def, ({ props }) => {
 })
 ```
 
-### Expose Component
+### Component Instance
 
-The component's context and everything you return from the component's setup function is available on the HTML element.
+Everything you return from the component's setup function is accessible via the `instance()` helper, fully typed:
 
 ```js
-component('my-component', ({ refs, refsAll, props }) => {
+// my-component.ts
+export default component('my-component', ({ props }) => {
   const sayHello = () => console.log(props.message)
   return { sayHello }
 })
 ```
 
 ```html
-<div data-component="my-component" id="my-id" data-message="Hello :~)">
-  <button data-ref="button">Click me!</button>
-</div>
+<div data-component="my-component" id="my-id" data-message="Hello :~)"></div>
 ```
 
 ```js
-const el = document.getElementById('my-id')
-el.$refs.button.innerText // => 'Click me!'
-el.$component.sayHello() // => 'Hello :~)'
-el.$props.message = 'Goodbye'
-el.$component.sayHello() // => 'Goodbye'
-```
-
-With typescript you can also get autocompletion:
-
-```ts
-// my-component.ts
-export default component('my-component', ({ props }) => {
-  const sayHello = () => console.log(props.message)
-  return { sayHello }
-})
-
-// index.ts
+import { instance } from '@very-simple/components'
 import MyComponent from './my-component.ts'
-import type { SimpleElement } from '@very-simple/components'
 
-type MyComponentElement = SimpleElement<typeof MyComponent>
-const el = document.getElementById<MyComponentElement>('my-id')
-
-el.$component.sayHello() // <- this gets autocompleted
+const el = document.getElementById('my-id')
+const myComponent = instance(el, MyComponent)
+myComponent.sayHello() // => 'Hello :~)'
 ```
 
 ### Refs
@@ -298,33 +279,35 @@ const def = define({
   events: { updateCounter: Number, close: null }
 })
 
-component('my-component', def, ({ el, ComponentEvent }) => {
+component('counter', def, ({ el, ComponentEvent }) => {
   // These will be autocompleted and generate type-errors if you forget, for
   // example, the value for the `updateCounter` event.
   el.dispatchEvent(new ComponentEvent('updateCounter', { detail: 10 }))
   el.dispatchEvent(new ComponentEvent('close'))
 
   // `ComponentEvent` ist just the native `CustomEvent` but with types based
-  // on your `options.events`.
+  // on your `def.events`.
 })
 ```
 
 This also works if you listen to a component's event from outside the component's setup fuction.
 
 ```ts
-// my-component.ts
+// counter.ts
 const def = define({ events: { updateCounter: Number } })
-export default component('my-component', def, () => {})
+export default component('counter', def, () => {})
 
 // index.ts
-import MyComponent from './my-component.ts'
-import type { SimpleElement } from '@very-simple/components'
+import Counter from './counter.ts'
+import { instance } from '@very-simple/components'
 
-type MyComponentElement = SimpleElement<typeof MyComponent>
-const el = document.getElementById<MyComponentElement>('my-id')
+const el = document.getElementById('my-id')
+const counter = instance(el, Counter)
 
 // This will be fully typed:
-el.addEventListener('updateCounter', ({ detail: count }) => console.log(count))
+counter.addEventListener('updateCounter', ({ detail: count }) =>
+  console.log(count)
+)
 ```
 
 ### Cleanup / Destroy

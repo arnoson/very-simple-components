@@ -1,12 +1,12 @@
 import { BuiltInTypeConstructor } from './base'
 
-export type SimpleEventMap<Definitions> = {
+export type EventMap<Definitions> = {
   [K in keyof Definitions]: Definitions[K] extends BuiltInTypeConstructor
     ? CustomEvent<ReturnType<Definitions[K]>>
     : CustomEvent<Definitions[K]>
 }
 
-export interface SimpleComponentEvent<
+export interface ComponentEvent<
   Events extends Record<string, CustomEvent> = any
 > extends CustomEvent {
   new <K extends keyof Events>(

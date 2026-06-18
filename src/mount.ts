@@ -6,16 +6,14 @@ import {
   stringifyProp
 } from './props'
 import { getRefs } from './refs'
-import { SimpleComponentEvent, SimpleElement } from './types'
+import { ComponentEvent as ComponentEventType, ComponentElement, Component } from './types'
 
 const mountComponent = (el: HTMLElement) => {
   const component = getComponent(el)
   if (!component) return
 
-  const isInitialized = !!(el as SimpleElement<any>).$component
+  const isInitialized = !!(el as ComponentElement<any>).$component
   if (isInitialized) return
-
-  const simpleEl = el as SimpleElement<typeof component>
 
   const propsDefinitions = component.definition.props
   const props = propsDefinitions
@@ -36,7 +34,7 @@ const mountComponent = (el: HTMLElement) => {
   }
 
   const { refs, refsAll } = getRefs(el)
-  const ComponentEvent = CustomEvent as SimpleComponentEvent
+  const ComponentEvent = CustomEvent as ComponentEventType
   const controller = new AbortController()
   let cleanupFn: (() => void) | undefined
   const cleanup = (fn: () => void) => {
@@ -52,13 +50,9 @@ const mountComponent = (el: HTMLElement) => {
     cleanup
   }
 
-  simpleEl.$props = props
-  simpleEl.$refs = refs
-  simpleEl.$refsAll = refsAll
-  simpleEl.$definition = component.definition
-  simpleEl.$component = component.setup(ctx) ?? {}
-
-  simpleEl.$destroy = () => {
+  const componentEl = el as ComponentElement<typeof component>
+  componentEl.$component = component.setup(ctx) ?? {}
+  componentEl.$destroy = () => {
     controller.abort()
     cleanupFn?.()
   }
@@ -71,12 +65,18 @@ export const mount = (el: HTMLElement = document.body) => {
   elements.forEach(mountComponent)
 }
 
+/** Get a mounted component element with correct typings */
+export const instance = <T extends Component>(
+  el: HTMLElement,
+  _component: T
+): ComponentElement<T> => el as ComponentElement<T>
+
 /** Unmount a single component, running any cleanup */
 export const unmount = (el: HTMLElement) => {
-  const simpleEl = el as SimpleElement<any>
-  if (simpleEl.$destroy) {
-    simpleEl.$destroy()
-    delete (simpleEl as any).$component
-    delete (simpleEl as any).$destroy
+  const componentEl = el as ComponentElement<any>
+  if (componentEl.$destroy) {
+    componentEl.$destroy()
+    delete componentEl.$component
+    delete componentEl.$destroy
   }
 }

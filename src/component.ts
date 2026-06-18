@@ -1,37 +1,37 @@
 import {
-  SimpleComponent,
-  SimpleComponentDefinition,
-  SimpleComponentSetup
+  Component,
+  ComponentDefinition,
+  ComponentSetup
 } from './types/component'
 
-export const components: Record<string, SimpleComponent<any>> = {}
+export const components: Record<string, Component<any>> = {}
 export const getComponent = (el: HTMLElement) => {
   const name = el.dataset.component
   return name ? components[name] : undefined
 }
 
-export function component<Setup extends SimpleComponentSetup>(
+export function component<Setup extends ComponentSetup>(
   name: string,
   setup: Setup
-): SimpleComponent
+): Component
 
 export function component<
-  Definition extends SimpleComponentDefinition,
-  Setup extends SimpleComponentSetup<Definition>
+  Definition extends ComponentDefinition,
+  Setup extends ComponentSetup<Definition>
 >(
   name: string,
   definition: Definition,
   setup: Setup
-): SimpleComponent<Definition, Setup>
+): Component<Definition, Setup>
 
 export function component<
-  Definition extends SimpleComponentDefinition,
-  Setup extends SimpleComponentSetup<Definition>
+  Definition extends ComponentDefinition,
+  Setup extends ComponentSetup<Definition>
 >(
   name: string,
   arg1: Definition | Setup,
   arg2?: Setup
-): SimpleComponent<Definition, Setup> {
+): Component<Definition, Setup> {
   const hasBothArgs = arg2 !== undefined
   const definition = (hasBothArgs ? arg1 : {}) as Definition
   const setup = (hasBothArgs ? arg2 : arg1) as Setup
@@ -44,6 +44,6 @@ export function component<
   return component
 }
 
-export const define = <Definition extends SimpleComponentDefinition>(
+export const define = <Definition extends ComponentDefinition>(
   definition: Definition
 ) => definition

@@ -5,7 +5,7 @@ const counterDef = define({
   events: { count: Number }
 })
 
-component('counter', counterDef, ctx => {
+const C = component('counter', counterDef, ctx => {
   const { el, props, ComponentEvent } = ctx
   const { count, countDisplay } = ctx.refs
 

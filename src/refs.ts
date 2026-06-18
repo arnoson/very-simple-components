@@ -1,7 +1,7 @@
-import { SimpleRefs, SimpleRefsAll } from './types'
+import { Refs, RefsAll } from './types'
 
 export const getRefs = (el: HTMLElement) => {
-  const refsAll: SimpleRefsAll = {}
+  const refsAll: RefsAll = {}
   const addRef = (name: string, el: HTMLElement) => {
     refsAll[name] ??= []
     refsAll[name].push(el)
@@ -25,7 +25,7 @@ export const getRefs = (el: HTMLElement) => {
     }
   })
 
-  const refs: SimpleRefs = Object.fromEntries(
+  const refs: Refs = Object.fromEntries(
     Object.entries(refsAll).map(([key, value]) => [key, value[0]])
   )
 
