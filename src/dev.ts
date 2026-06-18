@@ -1,11 +1,11 @@
-import { registerComponent, mountComponents, define, unmountComponent } from '.'
+import { component, mount, define, unmount } from '.'
 
 const counterDef = define({
   props: { count: 0 },
   events: { count: Number }
 })
 
-registerComponent('counter', counterDef, ctx => {
+component('counter', counterDef, ctx => {
   const { el, props, ComponentEvent } = ctx
   const { count, countDisplay } = ctx.refs
 
@@ -21,13 +21,13 @@ registerComponent('counter', counterDef, ctx => {
 
 const todosDef = define({ props: { todos: [] as string[] } })
 
-registerComponent('todos', todosDef, ({ props }) => {
+component('todos', todosDef, ({ props }) => {
   console.log(props.todos)
 
   props.todos = [...props.todos, 'three']
 })
 
-registerComponent('ticker', ({ el, signal }) => {
+component('ticker', ({ el, signal }) => {
   let tick = 0
   const id = setInterval(() => console.log(tick++), 1000)
 
@@ -35,7 +35,7 @@ registerComponent('ticker', ({ el, signal }) => {
   window.addEventListener(
     'click',
     () => {
-      unmountComponent(el)
+      unmount(el)
       el.remove()
     },
     { signal }
@@ -46,4 +46,4 @@ registerComponent('ticker', ({ el, signal }) => {
   }
 })
 
-mountComponents()
+mount(document.body)

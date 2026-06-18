@@ -15,11 +15,11 @@ npm i @very-simple/components
 ```js
 // components/gallery.js
 
-import { registerComponent, define } from '@very-simple/components'
+import { component, define } from '@very-simple/components'
 
 const def = define({ props: { loop: Boolean } })
 
-registerComponent('gallery', def, ({ el, props, refs, refsAll }) => {
+component('gallery', def, ({ el, props, refs, refsAll }) => {
   // Props are read from el's dataset and are automatically converted to the correct
   // type. Default values are also possible, see documentation.
   const { loop } = props
@@ -62,13 +62,13 @@ registerComponent('gallery', def, ({ el, props, refs, refsAll }) => {
 </div>
 
 <script type="module">
-  import { mountComponents } from '@very-simple/components'
+  import { mounts } from '@very-simple/components'
   // We only have to import the component, it will register itself.
   import './components/gallery.js'
 
   // This will look for any elements with a `data-component` attribute and
   // mount the corresponding component.
-  mountComponents()
+  mounts()
 </script>
 ```
 
@@ -77,7 +77,7 @@ registerComponent('gallery', def, ({ el, props, refs, refsAll }) => {
 ### Register a Component
 
 ```ts
-registerComponent('my-name', (ctx: Context) => {})
+component('my-name', (ctx: Context) => {})
 
 type Context = {
   // The element the component is mounted to.
@@ -138,7 +138,7 @@ const def = define({
   }
 })
 
-registerComponent('my-name', def, (ctx: Context) => {})
+component('my-name', def, (ctx: Context) => {})
 ```
 
 ### Mount a single Component
@@ -146,14 +146,14 @@ registerComponent('my-name', def, (ctx: Context) => {})
 Note: this will also mount any child components.
 
 ```ts
-mountComponent(el: HTMLElement)
+mount(el: HTMLElement)
 ```
 
 ### Mount all Components
 
 ```ts
 // If no `root` is provided, `<body>` is used.
-mountComponent(root?: HTMLElement)
+mount(root?: HTMLElement)
 ```
 
 ### Props
@@ -163,7 +163,7 @@ mountComponent(root?: HTMLElement)
 ```ts
 const def = define({ props: { count: 0 } })
 
-registerComponent('my-component', def, ({ el, props }) => {
+component('my-component', def, ({ el, props }) => {
   // If the element hasn't `data-count` specified, this will output the default
   // value `0`.
   console.log(props.count) // => 0
@@ -182,7 +182,7 @@ const def = define({ props: { todos: [] as string[] } })
 // Lets say the html for the component looks like this:
 // <div data-component="todo" data-todos='["mount components!", "enjoy"]'>
 
-registerComponent('todo', def, ({ props }) => {
+component('todo', def, ({ props }) => {
   console.log(props.todos[0]) // => 'mount components!'
 })
 ```
@@ -192,7 +192,7 @@ registerComponent('todo', def, ({ props }) => {
 The component's context and everything you return from the component's setup function is available on the HTML element.
 
 ```js
-registerComponent('my-component', ({ refs, refsAll, props }) => {
+component('my-component', ({ refs, refsAll, props }) => {
   const sayHello = () => console.log(props.message)
   return { sayHello }
 })
@@ -216,7 +216,7 @@ With typescript you can also get autocompletion:
 
 ```ts
 // my-component.ts
-export default registerComponent('my-component', ({ props }) => {
+export default component('my-component', ({ props }) => {
   const sayHello = () => console.log(props.message)
   return { sayHello }
 })
@@ -241,7 +241,7 @@ const def = define({
   refs: { img: HTMLImageElement, videos: HTMLVideoElement }
 })
 
-registerComponent('my-component', def, ({ refs, refsAll }) => {
+component('my-component', def, ({ refs, refsAll }) => {
   const { container, img } = refs
   // container -> HTMLElement
   // img -> HTMLImageElement
@@ -256,14 +256,14 @@ You can also use another simple component as a ref type. This is very useful ins
 
 ```ts
 // child.ts
-export default registerComponent('child', () => {})
+export default component('child', () => {})
 
 // parent.ts
 import Child from './child.ts'
 
 const def = define({ refs: { theChild: Child } })
 
-registerComponent('parent', def, ({ refs }) => {
+component('parent', def, ({ refs }) => {
   // ...
 })
 ```
@@ -298,7 +298,7 @@ const def = define({
   events: { updateCounter: Number, close: null }
 })
 
-registerComponent('my-component', def, ({ el, ComponentEvent }) => {
+component('my-component', def, ({ el, ComponentEvent }) => {
   // These will be autocompleted and generate type-errors if you forget, for
   // example, the value for the `updateCounter` event.
   el.dispatchEvent(new ComponentEvent('updateCounter', { detail: 10 }))
@@ -314,7 +314,7 @@ This also works if you listen to a component's event from outside the component'
 ```ts
 // my-component.ts
 const def = define({ events: { updateCounter: Number } })
-export default registerComponent('my-component', def, () => {})
+export default component('my-component', def, () => {})
 
 // index.ts
 import MyComponent from './my-component.ts'
@@ -336,7 +336,7 @@ When a component is removed from the DOM, you can clean up resources like interv
 The `signal` in the component context integrates natively with `addEventListener`'s `signal` option. Event listeners registered this way are automatically removed when the component is destroyed:
 
 ```ts
-registerComponent('my-component', ({ signal }) => {
+component('my-component', ({ signal }) => {
   // Automatically removed when the component is destroyed.
   window.addEventListener('resize', onResize, { signal })
 })
@@ -347,7 +347,7 @@ registerComponent('my-component', ({ signal }) => {
 For teardown that isn't an event listener (intervals, observers, etc.), call `cleanup()` with a teardown function:
 
 ```ts
-registerComponent('my-component', ({ cleanup }) => {
+component('my-component', ({ cleanup }) => {
   const id = setInterval(tick, 1000)
   cleanup(() => clearInterval(id))
 })
@@ -355,10 +355,10 @@ registerComponent('my-component', ({ cleanup }) => {
 
 #### Destroying a component
 
-Call `unmountComponent(el)` to destroy a component. This aborts its signal and calls `cleanup()` if defined:
+Call `unmount(el)` to destroy a component. This aborts its signal and calls `cleanup()` if defined:
 
 ```ts
-import { unmountComponent } from '@very-simple/components'
+import { unmount } from '@very-simple/components'
 
-unmountComponent(el)
+unmount(el)
 ```

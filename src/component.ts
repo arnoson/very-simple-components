@@ -10,12 +10,12 @@ export const getComponent = (el: HTMLElement) => {
   return name ? components[name] : undefined
 }
 
-export function registerComponent<Setup extends SimpleComponentSetup>(
+export function component<Setup extends SimpleComponentSetup>(
   name: string,
   setup: Setup
 ): SimpleComponent
 
-export function registerComponent<
+export function component<
   Definition extends SimpleComponentDefinition,
   Setup extends SimpleComponentSetup<Definition>
 >(
@@ -24,7 +24,7 @@ export function registerComponent<
   setup: Setup
 ): SimpleComponent<Definition, Setup>
 
-export function registerComponent<
+export function component<
   Definition extends SimpleComponentDefinition,
   Setup extends SimpleComponentSetup<Definition>
 >(

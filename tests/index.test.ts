@@ -1,16 +1,16 @@
 import { expect, it, vi } from 'vitest'
-import { define, registerComponent } from '../src'
+import { define, component } from '../src'
 import { SimpleElement } from '../src/types/component'
-import { mountComponent, mountComponents, unmountComponent } from '../src/mount'
+import { mount, unmount } from '../src/mount'
 
 it('mounts a component', () => {
   const setup = vi.fn()
-  registerComponent('test', setup)
+  component('test', setup)
 
   const div = document.createElement('div')
   div.dataset.component = 'test'
 
-  mountComponent(div)
+  mount(div)
   expect(setup).toHaveBeenCalledWith(
     expect.objectContaining({
       el: div,
@@ -29,14 +29,14 @@ it('aborts signal when component is unmounted', () => {
   div.dataset.component = 'signal-test'
 
   let componentSignal: AbortSignal
-  registerComponent('signal-test', ({ signal }) => {
+  component('signal-test', ({ signal }) => {
     componentSignal = signal
   })
 
-  mountComponent(div)
+  mount(div)
   expect(componentSignal!.aborted).toBe(false)
 
-  unmountComponent(div)
+  unmount(div)
   expect(componentSignal!.aborted).toBe(true)
 })
 
@@ -45,50 +45,50 @@ it('calls cleanup() when component is unmounted', () => {
   div.dataset.component = 'cleanup-test'
 
   const cleanup = vi.fn()
-  registerComponent('cleanup-test', ({ cleanup: onCleanup }) => {
+  component('cleanup-test', ({ cleanup: onCleanup }) => {
     onCleanup(cleanup)
   })
 
-  mountComponent(div)
+  mount(div)
   expect(cleanup).not.toHaveBeenCalled()
 
-  unmountComponent(div)
+  unmount(div)
   expect(cleanup).toHaveBeenCalledTimes(1)
 })
 
 it('mounts multiple components', () => {
   const componentA = vi.fn()
-  registerComponent('a', componentA)
+  component('a', componentA)
 
   const componentB = vi.fn()
-  registerComponent('b', componentB)
+  component('b', componentB)
 
   document.body.innerHTML = `
     <div data-component="a"></div>
     <div data-component="a"></div>
     <div data-component="b"></div>
   `
-  mountComponents(document.body)
+  mount(document.body)
   expect(componentA).toBeCalledTimes(2)
   expect(componentB).toBeCalledTimes(1)
 })
 
 it(`doesn't mount an already mounted component`, () => {
-  const component = vi.fn()
-  registerComponent('test', component)
+  const test = vi.fn()
+  component('test', test)
 
   const div = document.createElement('div')
   div.dataset.component = 'test'
 
-  mountComponent(div)
-  mountComponent(div)
+  mount(div)
+  mount(div)
 
-  expect(component).toBeCalledTimes(1)
+  expect(test).toBeCalledTimes(1)
 })
 
 it('provides a record of single refs', () => {
-  const component = vi.fn()
-  registerComponent('test', component)
+  const test = vi.fn()
+  component('test', test)
 
   document.body.innerHTML = `
     <div data-component="test" id="my-test">
@@ -100,18 +100,18 @@ it('provides a record of single refs', () => {
       </div>
     </div>
   `
-  mountComponents(document.body)
+  mount(document.body)
   const myRef = document.querySelector('#ref1')
   const deepRef = document.querySelector('#ref2')
   const selectorDeepRef = document.querySelector('#ref3')
-  expect(component).toHaveBeenCalledWith(
+  expect(test).toHaveBeenCalledWith(
     expect.objectContaining({ refs: { myRef, deepRef, selectorDeepRef } })
   )
 })
 
 it('provides a record of groups of refs with the same name', () => {
-  const component = vi.fn()
-  registerComponent('test', component)
+  const test = vi.fn()
+  component('test', test)
 
   document.body.innerHTML = `
     <div data-component="test">
@@ -123,14 +123,14 @@ it('provides a record of groups of refs with the same name', () => {
       </div>
     </div>
   `
-  mountComponents(document.body)
+  mount(document.body)
   const myRef = [
     document.querySelector('#ref1'),
     document.querySelector('#ref2'),
     document.querySelector('#ref3'),
     document.querySelector('#ref4')
   ]
-  expect(component).toHaveBeenCalledWith(
+  expect(test).toHaveBeenCalledWith(
     expect.objectContaining({ refsAll: { myRef } })
   )
 })
@@ -158,8 +158,8 @@ it(`parses props`, () => {
   })
 
   let props: any
-  registerComponent('test', def, ctx => (props = ctx.props))
-  mountComponents()
+  component('test', def, ctx => (props = ctx.props))
+  mount()
 
   expect(props.number).toBe(1)
   expect(props.string).toBe('text')
@@ -183,8 +183,8 @@ it(`provides default values for props`, () => {
   })
 
   let props: any
-  registerComponent('test', def, ctx => (props = ctx.props))
-  mountComponents()
+  component('test', def, ctx => (props = ctx.props))
+  mount()
 
   expect(props.number).toBe(10)
   expect(props.string).toBe('hello')
@@ -205,8 +205,8 @@ it(`adds default values to the dataset`, () => {
     }
   })
 
-  registerComponent('test', def, () => {})
-  mountComponents()
+  component('test', def, () => {})
+  mount()
 
   expect(el?.dataset.missing).toBe('10')
   expect(el?.dataset.provided).toBe('provided')
@@ -236,8 +236,8 @@ it('interferes prop types from default values', () => {
   })
 
   let props: any
-  registerComponent('test', def, ctx => (props = ctx.props))
-  mountComponents()
+  component('test', def, ctx => (props = ctx.props))
+  mount()
 
   expect(props.number).toBe(1)
   expect(props.string).toBe('text')
@@ -247,7 +247,7 @@ it('interferes prop types from default values', () => {
 })
 
 it(`exposes the component's refs`, () => {
-  const component = registerComponent('test', () => {})
+  const test = component('test', () => {})
 
   document.body.innerHTML = `
     <div data-component="test" id="my-id">
@@ -255,13 +255,13 @@ it(`exposes the component's refs`, () => {
     </div>
   `
   const refs = { ref: document.getElementById('ref') }
-  mountComponents(document.body)
-  const el = document.getElementById('my-id') as SimpleElement<typeof component>
+  mount(document.body)
+  const el = document.getElementById('my-id') as SimpleElement<typeof test>
   expect(el.$refs).toEqual(refs)
 })
 
 it(`exposes the component's refsAll`, () => {
-  const component = registerComponent('test', () => {})
+  const test = component('test', () => {})
 
   document.body.innerHTML = `
     <div data-component="test" id="my-id">
@@ -275,8 +275,8 @@ it(`exposes the component's refsAll`, () => {
     document.getElementById('ref2')
   ]
 
-  mountComponents(document.body)
-  const el = document.getElementById('my-id') as SimpleElement<typeof component>
+  mount(document.body)
+  const el = document.getElementById('my-id') as SimpleElement<typeof test>
   expect(el.$refsAll).toEqual({ myRef })
 })
 
@@ -286,23 +286,23 @@ it(`exposes the component's props`, () => {
   `
   const def = define({ props: { prop: 10 } })
   let props: any
-  const component = registerComponent('test', def, ctx => (props = ctx.props))
-  mountComponents()
+  const test = component('test', def, ctx => (props = ctx.props))
+  mount()
 
-  const el = document.getElementById('my-id') as SimpleElement<typeof component>
+  const el = document.getElementById('my-id') as SimpleElement<typeof test>
   expect(el.$props).toBe(props)
 })
 
 it(`exposes the component's setup function's return value`, () => {
   const exposed = { test: () => {} }
-  const component = registerComponent('test', () => exposed)
+  const test = component('test', () => exposed)
 
   document.body.innerHTML = `
     <div data-component="test" id="my-id"></div>
   `
 
-  mountComponents(document.body)
-  const el = document.getElementById('my-id') as SimpleElement<typeof component>
+  mount(document.body)
+  const el = document.getElementById('my-id') as SimpleElement<typeof test>
   expect(el.$component).toBe(exposed)
 })
 
@@ -312,13 +312,13 @@ it(`exposes the component's definition`, () => {
     props: { prop: 10 },
     events: { count: Number }
   })
-  const component = registerComponent('test', def, () => {})
+  const test = component('test', def, () => {})
 
   document.body.innerHTML = `
     <div data-component="test" id="my-id"></div>
   `
 
-  mountComponents(document.body)
-  const el = document.getElementById('my-id') as SimpleElement<typeof component>
+  mount(document.body)
+  const el = document.getElementById('my-id') as SimpleElement<typeof test>
   expect(el.$definition).toBe(def)
 })
