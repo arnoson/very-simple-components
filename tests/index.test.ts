@@ -18,7 +18,8 @@ it('mounts a component', () => {
       refsAll: {},
       props: div.dataset,
       ComponentEvent: CustomEvent,
-      signal: expect.any(AbortSignal)
+      signal: expect.any(AbortSignal),
+      cleanup: expect.any(Function)
     })
   )
 })
@@ -44,7 +45,9 @@ it('calls cleanup() when component is unmounted', () => {
   div.dataset.component = 'cleanup-test'
 
   const cleanup = vi.fn()
-  registerComponent('cleanup-test', () => ({ cleanup }))
+  registerComponent('cleanup-test', ({ cleanup: onCleanup }) => {
+    onCleanup(cleanup)
+  })
 
   mountComponent(div)
   expect(cleanup).not.toHaveBeenCalled()

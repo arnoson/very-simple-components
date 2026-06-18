@@ -45,26 +45,29 @@ export const mountComponent = (el: HTMLElement, isChild = false) => {
     const { refs, refsAll } = getRefs(el)
     const ComponentEvent = CustomEvent as SimpleComponentEvent
     const controller = new AbortController()
+    let cleanupFn: (() => void) | undefined
+    const cleanup = (fn: () => void) => {
+      cleanupFn = fn
+    }
     const ctx = {
       el,
       props,
       refs,
       refsAll,
       ComponentEvent,
-      signal: controller.signal
+      signal: controller.signal,
+      cleanup
     }
 
     simpleEl.$props = props
     simpleEl.$refs = refs
     simpleEl.$refsAll = refsAll
     simpleEl.$definition = component.definition
-
-    const result = component.setup(ctx) ?? {}
-    simpleEl.$component = result
+    simpleEl.$component = component.setup(ctx) ?? {}
 
     simpleEl.$destroy = () => {
       controller.abort()
-      result.cleanup?.()
+      cleanupFn?.()
     }
   }
 

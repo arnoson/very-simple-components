@@ -43,6 +43,7 @@ export type SimpleComponentContext<
   refsAll: Record<string, HTMLElement[]> & SimpleRefsAll<Refs>
   ComponentEvent: SimpleComponentEvent<SimpleEventMap<Definition['events']>>
   signal: AbortSignal
+  cleanup: (fn: () => void) => void
 }
 
 /* Element with a mounted component */

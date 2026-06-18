@@ -103,6 +103,10 @@ type Context = {
   // An AbortSignal that is aborted when the component is destroyed.
   // See: #Cleanup--Destroy
   signal: AbortSignal
+
+  // Register a teardown function to run when the component is destroyed.
+  // See: #Cleanup--Destroy
+  cleanup: (fn: () => void) => void
 }
 ```
 
@@ -340,16 +344,12 @@ registerComponent('my-component', ({ signal }) => {
 
 #### `cleanup()` — for everything else
 
-For teardown that isn't an event listener (intervals, observers, etc.), return a `cleanup()` method from the setup function:
+For teardown that isn't an event listener (intervals, observers, etc.), call `cleanup()` with a teardown function:
 
 ```ts
-registerComponent('my-component', () => {
-  let tick = 0
-  const id = setInterval(() => console.log(tick++), 1000)
-
-  return {
-    cleanup: () => clearInterval(id)
-  }
+registerComponent('my-component', ({ cleanup }) => {
+  const id = setInterval(tick, 1000)
+  cleanup(() => clearInterval(id))
 })
 ```
 
