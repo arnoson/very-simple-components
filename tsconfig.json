@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
-    "lib": ["es2019", "dom"],
-    "moduleResolution": "node",
+    "lib": ["ESNext", "DOM"],
+    "moduleResolution": "bundler",
+    "ignoreDeprecations": "6.0",
     "strict": true
   },
   "include": ["src/**/*"],
