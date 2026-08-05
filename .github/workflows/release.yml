@@ -29,8 +29,18 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Determine npm dist-tag
+        id: npm-tag
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          TAG="latest"
+          if [[ "$VERSION" =~ -([a-zA-Z]+)(\.|$) ]]; then
+            TAG="${BASH_REMATCH[1]}"
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
       - name: Publish to npm
-        run: npm publish --provenance --access public
+        run: npm publish --provenance --access public --tag ${{ steps.npm-tag.outputs.tag }}
 
       - run: npx changelogithub
         env:
