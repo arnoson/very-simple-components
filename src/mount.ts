@@ -6,9 +6,15 @@ import {
   stringifyProp
 } from './props'
 import { getRefs } from './refs'
-import { ComponentEvent as ComponentEventType, ComponentElement, Component } from './types'
+import {
+  ComponentEvent as ComponentEventType,
+  ComponentElement,
+  Component
+} from './types'
 
-const mountComponent = (el: HTMLElement) => {
+const mountComponent = (el: Element) => {
+  if (!(el instanceof HTMLElement)) return
+
   const component = getComponent(el)
   if (!component) return
 
@@ -59,10 +65,9 @@ const mountComponent = (el: HTMLElement) => {
 }
 
 /** Mount a component and all child components */
-export const mount = (el: HTMLElement = document.body) => {
-  mountComponent(el)
-  const elements = el.querySelectorAll<HTMLElement>('[data-component]')
-  elements.forEach(mountComponent)
+export const mount = (el: Element = document.body) => {
+  if (el instanceof HTMLElement) mountComponent(el)
+  el.querySelectorAll('[data-component]').forEach(mountComponent)
 }
 
 /** Get a mounted component element with correct typings */
@@ -72,11 +77,17 @@ export const instance = <T extends Component>(
 ): ComponentElement<T> => el as ComponentElement<T>
 
 /** Unmount a single component, running any cleanup */
-export const unmount = (el: HTMLElement) => {
+const unmountComponent = (el: Element) => {
   const componentEl = el as ComponentElement<any>
   if (componentEl.$destroy) {
     componentEl.$destroy()
     delete componentEl.$component
     delete componentEl.$destroy
   }
+}
+
+/** Unmount a component and all child components */
+export const unmount = (el: Element = document.body) => {
+  if (el.hasAttribute('data-component')) unmountComponent(el)
+  el.querySelectorAll('[data-component]').forEach(unmountComponent)
 }
