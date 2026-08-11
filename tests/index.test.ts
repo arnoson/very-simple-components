@@ -108,6 +108,22 @@ it('provides a record of single refs', () => {
   )
 })
 
+it('resolves a ref on a child component element to the parent component', () => {
+  const test = vi.fn()
+  component('test', test)
+
+  document.body.innerHTML = `
+    <div data-component="test">
+      <div id="ref1" data-component="child-component" data-ref="childRef"></div>
+    </div>
+  `
+  mount(document.body)
+  const childRef = document.querySelector('#ref1')
+  expect(test).toHaveBeenCalledWith(
+    expect.objectContaining({ refs: { childRef } })
+  )
+})
+
 it('provides a record of groups of refs with the same name', () => {
   const test = vi.fn()
   component('test', test)

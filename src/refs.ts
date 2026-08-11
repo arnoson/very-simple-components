@@ -20,7 +20,8 @@ export const getRefs = (el: HTMLElement) => {
       const parentEl = refEl.closest(parentSelector)
       if (parentEl === el) addRef(name, refEl)
     } else {
-      const closestComponent = refEl.closest('[data-component]')
+      // start from parent so a component element with data-ref matches its parent
+      const closestComponent = refEl.parentElement?.closest('[data-component]')
       if (closestComponent === el) addRef(value, refEl)
     }
   })
