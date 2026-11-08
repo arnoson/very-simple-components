@@ -62,13 +62,13 @@ component('gallery', def, ({ el, props, refs, refsAll }) => {
 </div>
 
 <script type="module">
-  import { mounts } from '@very-simple/components'
+  import { mount } from '@very-simple/components'
   // We only have to import the component, it will register itself.
   import './components/gallery.js'
 
   // This will look for any elements with a `data-component` attribute and
   // mount the corresponding component.
-  mounts()
+  mount()
 </script>
 ```
 
